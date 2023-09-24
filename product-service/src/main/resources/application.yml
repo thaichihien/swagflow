@@ -1,0 +1,20 @@
+server:
+  port: 3002
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/swagflow-product
+    username: postgres
+    password: 258456
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api

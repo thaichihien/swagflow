@@ -1,2 +1,15 @@
-package com.swagflow.productservice.product.dto;public class ProductSizeResponse {
+package com.swagflow.productservice.product.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductSizeResponse {
+
+    private String name;
+    private Integer quantity;
+
 }

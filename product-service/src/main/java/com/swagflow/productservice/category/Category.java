@@ -1,10 +1,10 @@
-package com.swagflow.productservice.product.model;
+package com.swagflow.productservice.category;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.swagflow.productservice.product.model.BaseEntity;
+import com.swagflow.productservice.product.model.Product;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {
 
@@ -22,6 +23,7 @@ public class Category extends BaseEntity {
     private UUID id;
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
-    private List<Product> products = new ArrayList<>();
+    private List<Product> products;
 }

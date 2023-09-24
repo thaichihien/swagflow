@@ -6,9 +6,8 @@ export class CustomerRepository implements IRepository<Customer> {
   constructor(private prismaService: PrismaService) {}
 
   async create(dto: any): Promise<Customer> {
-    //console.log(this.prismaService)
     const created = await this.prismaService.customer.create({
-        data : dto
+      data: dto,
     });
     return created;
   }
@@ -22,16 +21,28 @@ export class CustomerRepository implements IRepository<Customer> {
     return one;
   }
   async findOne(option: any): Promise<Customer> {
-    throw new Error('Method not implemented.');
+    const one = await this.prismaService.customer.findFirst(option);
+    return one;
   }
   async findAll(option?: any): Promise<Customer[]> {
     const all = await this.prismaService.customer.findMany(option);
     return all;
   }
   async update(id: string, dto: Partial<Customer>): Promise<Customer> {
-    throw new Error('Method not implemented.');
+    const updated = await this.prismaService.customer.update({
+      where: {
+        id: id,
+      },
+      data: dto,
+    });
+    return updated;
   }
   async delete(id: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    await this.prismaService.customer.delete({
+      where: {
+        id: id,
+      },
+    });
+    return true;
   }
 }

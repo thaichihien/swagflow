@@ -28,9 +28,7 @@ export class PrismaDatabases implements IDataServices, OnApplicationBootstrap {
   }>;
 
   constructor(private readonly prismaService: PrismaService) {}
-  onApplicationBootstrap() {
-    console.log("onApplicationBootstrap");
-    //console.log(this.prismaService); 
+  onApplicationBootstrap() { 
     this.customer = new CustomerRepository(this.prismaService);
   }
 }

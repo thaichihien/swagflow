@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.setGlobalPrefix("api/v1")
   const config = new DocumentBuilder()
     .setTitle('Backend Nest JS Learning')
     .setDescription('API description')
@@ -20,7 +20,8 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-
+  
+  
   await app.listen(PORT);
   console.log(`listening at http://localhost:${PORT}`);
 }

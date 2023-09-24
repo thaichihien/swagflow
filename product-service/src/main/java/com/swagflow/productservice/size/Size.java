@@ -1,10 +1,10 @@
-package com.swagflow.productservice.product.model;
+package com.swagflow.productservice.size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.swagflow.productservice.product.model.BaseEntity;
+import com.swagflow.productservice.product.model.ProductSize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @EqualsAndHashCode(callSuper = true)
 public class Size extends BaseEntity {
 
@@ -21,7 +22,8 @@ public class Size extends BaseEntity {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "size")
-    private List<ProductSize> products = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "size",cascade = CascadeType.ALL)
+    private List<ProductSize> products;
 
 }

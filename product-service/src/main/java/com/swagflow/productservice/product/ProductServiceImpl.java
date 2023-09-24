@@ -1,10 +1,8 @@
-package com.swagflow.productservice;
+package com.swagflow.productservice.product;
 
 import com.swagflow.productservice.category.CategoryService;
 import com.swagflow.productservice.product.ProductService;
-import com.swagflow.productservice.product.dto.CreateProductDto;
-import com.swagflow.productservice.product.dto.SizeDto;
-import com.swagflow.productservice.product.dto.UpdateProductDto;
+import com.swagflow.productservice.product.dto.*;
 import com.swagflow.productservice.category.Category;
 import com.swagflow.productservice.product.model.Product;
 import com.swagflow.productservice.product.model.ProductSize;
@@ -31,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public Product create(CreateProductDto createProductDto) {
+    public ProductResponse create(CreateProductDto createProductDto) {
 
         Category category = categoryService.findById(createProductDto.getCategoryId());
 
@@ -41,37 +39,96 @@ public class ProductServiceImpl implements ProductService {
                 .price(createProductDto.getPrice())
                 .category(category)
                 .build();
+        productRepository.getProduct().save(created);
 
         List<ProductSize> sizes = updateProductSizeOfProduct(createProductDto.getSizes(), created);
         created.setProductSizes(sizes);
-        productRepository.product.save(created);
-        return created;
+        productRepository.getProduct().save(created);
+
+        List<ProductSizeResponse> sizeResponses = sizes.stream().map(sizeProduct ->
+                new ProductSizeResponse(
+                        sizeProduct.getSize().getName(),
+                        sizeProduct.getQuantity())
+        ).toList();
+
+        return ProductResponse
+                .builder()
+                .id(created.getId())
+                .name(created.getName())
+                .description(created.getDescription())
+                .price(created.getPrice())
+                .category(category.getName())
+                .sizes(sizeResponses)
+                .build();
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        List<Product> all = productRepository.product.findAll();
-        return all;
+    public List<ProductResponse> getAllProducts() {
+        return productRepository.getProduct().findAll().stream()
+                .map(product -> {
+                    List<ProductSizeResponse> sizeResponses = product.getProductSizes().stream().map(sizeProduct ->
+                            new ProductSizeResponse(
+                                    sizeProduct.getSize().getName(),
+                                    sizeProduct.getQuantity())
+                    ).toList();
+                            return ProductResponse.builder()
+                                    .id(product.getId())
+                                    .name(product.getName())
+                                    .description(product.getDescription())
+                                    .price(product.getPrice())
+                                    .category(product.getCategory().getName())
+                                    .sizes(sizeResponses)
+                                    .build();
+                        }
+                ).toList();
+
     }
 
     @Override
-    public Product findById(String id) {
+    public ProductResponse findById(String id) {
         UUID uuid = UUID.fromString(id);
-        Optional<Product> one = productRepository.product.findById(uuid);
-        return one.orElseThrow();
+        Product one = productRepository.getProduct().findById(uuid).orElseThrow();
+        List<ProductSizeResponse> sizeResponses = one.getProductSizes().stream().map(sizeProduct ->
+                new ProductSizeResponse(
+                        sizeProduct.getSize().getName(),
+                        sizeProduct.getQuantity())
+        ).toList();
+        return ProductResponse.builder()
+                .id(one.getId())
+                .name(one.getName())
+                .description(one.getDescription())
+                .price(one.getPrice())
+                .category(one.getCategory().getName())
+                .sizes(sizeResponses)
+                .build();
     }
 
     @Override
-    public Product update(UpdateProductDto updateProductDto) {
+    public ProductResponse update(UpdateProductDto updateProductDto) {
         UUID uuid = UUID.fromString(updateProductDto.getId());
-        Product updated = productRepository.product.findById(uuid).orElseThrow();
+        Product updated = productRepository.getProduct().findById(uuid).orElseThrow();
         updated.setName(updateProductDto.getName());
         updated.setDescription(updateProductDto.getDescription());
         updated.setPrice(updateProductDto.getPrice());
         List<ProductSize> sizes = updateProductSizeOfProduct(updateProductDto.getSizes(), updated);
         updated.setProductSizes(sizes);
-        productRepository.product.save(updated);
-        return updated;
+        productRepository.getProduct().save(updated);
+
+        List<ProductSizeResponse> sizeResponses = sizes.stream().map(sizeProduct ->
+                new ProductSizeResponse(
+                        sizeProduct.getSize().getName(),
+                        sizeProduct.getQuantity())
+        ).toList();
+
+        return ProductResponse
+                .builder()
+                .id(updated.getId())
+                .name(updated.getName())
+                .description(updated.getDescription())
+                .price(updated.getPrice())
+                .category(updated.getCategory().getName())
+                .sizes(sizeResponses)
+                .build();
     }
 
     @Override
@@ -93,7 +150,7 @@ public class ProductServiceImpl implements ProductService {
                     .quantity(sizeDto.getQuantity())
                     .build();
 
-            productRepository.productSize.save(productSize);
+            productRepository.getProductSize().save(productSize);
             productSizes.add(productSize);
         });
 
