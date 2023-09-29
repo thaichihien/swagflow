@@ -12,6 +12,7 @@ public interface CategoryService {
     List<Category> getAllCategories();
 
     Category findById(String id);
+    Category findByName(String name);
 
     Category update(UpdateCategoryDto updateCategoryDto);
 

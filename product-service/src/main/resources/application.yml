@@ -1,6 +1,12 @@
 server:
   port: 3002
 
+services:
+  api:
+    imgbb:
+      url: https://api.imgbb.com/1
+      key: df7a42601487b2a866a68765d07d9ec2
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/swagflow-product

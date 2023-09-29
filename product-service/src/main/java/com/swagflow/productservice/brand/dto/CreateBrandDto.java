@@ -1,2 +1,12 @@
-package com.swagflow.productservice.brand.dto;public class CreateBrandDto {
+package com.swagflow.productservice.brand.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class CreateBrandDto {
+    String name;
 }

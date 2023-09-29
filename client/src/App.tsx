@@ -18,7 +18,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/playground" element={<Playground />} />
           </Route>
-          <Route element={<h1>Not found</h1>} />
+          <Route path="*" element={<h1>Not found</h1>} />
         </Routes>
       </BrowserRouter>
     </>

@@ -19,6 +19,9 @@ public class CreateProductDto {
     @JsonProperty("category_id")
     private String categoryId;
 
+    @JsonProperty("brand_id")
+    private String brandId;
+
     private List<SizeDto> sizes;
 
 }

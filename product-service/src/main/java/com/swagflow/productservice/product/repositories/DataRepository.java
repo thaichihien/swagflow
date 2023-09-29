@@ -13,9 +13,7 @@ import org.springframework.stereotype.Repository;
 public class DataRepository {
 
     private final ProductRepository product;
-
-
     private final ProductSizeRepository productSize;
-
+    private final ProductImageRepository productImage;
 
 }

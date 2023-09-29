@@ -38,7 +38,16 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public Category findById(String id) {
         UUID categoryId = UUID.fromString(id);
-        return categoryRepository.findById(categoryId).orElseThrow();
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,String.format("Category is not found with id : %s",id)));
+    }
+
+    @Override
+    public Category findByName(String name) {
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,String.format("Category is not found with name : %s",name)));
     }
 
     @Override
