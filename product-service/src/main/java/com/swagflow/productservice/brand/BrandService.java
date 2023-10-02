@@ -20,5 +20,7 @@ public interface BrandService {
     Brand update(UpdateBrandDto updateBrandDto);
 
     void delete(String id);
+
+    void clearAll();
     
 }

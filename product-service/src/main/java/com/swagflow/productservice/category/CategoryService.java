@@ -17,6 +17,8 @@ public interface CategoryService {
     Category update(UpdateCategoryDto updateCategoryDto);
 
     void delete(String id);
+
+    void clearAll();
     
     
 }

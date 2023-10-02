@@ -8,6 +8,8 @@ import Notfound from "./pages/Notfound"
 import ProductList from "./pages/ProductList"
 import AddProduct from "./pages/AddProduct"
 import Playground from "./pages/Playground"
+import ImportProducts from "./pages/ImportProducts"
+import { ToastContainer } from "react-toastify"
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="/products" element={<ProductList/>}/>
             <Route path="/add-product" element={<AddProduct/>}/>
+            <Route path="/import" element={<ImportProducts/>}/>
             <Route path="/playground" element={<Playground/>}/>
 
             {/* <Route path="/about" element={<About />} />
@@ -28,6 +31,7 @@ function App() {
           <Route path="*" element={<Notfound/>} />
         </Routes>
       </BrowserRouter>
+     
     </>
   )
 }

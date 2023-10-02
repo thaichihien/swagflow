@@ -21,6 +21,8 @@ public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(unique = true)
     private String name;
 
     @JsonIgnore

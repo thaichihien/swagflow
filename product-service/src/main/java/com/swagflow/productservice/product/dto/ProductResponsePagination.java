@@ -1,2 +1,25 @@
-package com.swagflow.productservice.product.dto;public class ProductResponsePagination {
+package com.swagflow.productservice.product.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
+
+@Data
+@Builder
+public class ProductResponsePagination{
+
+
+    @JsonProperty("total_items")
+    private long totalItems;
+    @JsonProperty("total_pages")
+    private int totalPages;
+    @JsonProperty("current_page")
+    private int currentPage;
+
+    private List<ProductResponse> data;
 }

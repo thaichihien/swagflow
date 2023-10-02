@@ -3,6 +3,7 @@ import Sidebar from '../partials/Sidebar'
 import Footer from '../partials/Footer'
 import Navbar from '../partials/Navbar'
 import {Outlet} from "react-router-dom"
+import { ToastContainer } from 'react-toastify'
 
 type Props = {}
 
@@ -18,8 +19,10 @@ function Layout({}: Props) {
             <Navbar/>
         {/* <!-- partial --> */}
         <div className="main-panel">
+        <ToastContainer/>
           <div className="content-wrapper">
             <Outlet/>
+           
           </div>
           {/* <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html --> */}
@@ -29,7 +32,10 @@ function Layout({}: Props) {
         {/* <!-- main-panel ends --> */}
       </div>
       {/* <!-- page-body-wrapper ends --> */}
+       
+      
        </div>
+       
     </>
   )
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class UpdateCategoryDto {
-    private UUID id;
+    private String id;
     private String name;
 }

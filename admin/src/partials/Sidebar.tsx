@@ -128,6 +128,15 @@ function Sidebar({}: Props) {
                 </li>
                 <li className="nav-item">
                   {" "}
+                  <Link
+                    className="nav-link"
+                    to="/import"
+                  >
+                    Import products
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  {" "}
                   <a
                     className="nav-link"
                     href="pages/ui-features/typography.html"

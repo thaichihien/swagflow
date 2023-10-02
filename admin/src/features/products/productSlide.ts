@@ -35,9 +35,7 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
     const response = await fetch(serverConfig.endpoint("/product?view=admin"))
-    
     const data = await response.json()
-    console.log(data);
     return data
   },
 )
@@ -45,7 +43,11 @@ export const fetchProducts = createAsyncThunk(
 const productSlide = createSlice({
   name: "products",
   initialState,
-  reducers: {},
+  reducers: {
+    updateProducts: (state, action) => {
+      state.data = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
@@ -63,3 +65,4 @@ const productSlide = createSlice({
 })
 
 export default productSlide.reducer
+export const {updateProducts} = productSlide.actions

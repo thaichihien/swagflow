@@ -2,6 +2,7 @@ package com.swagflow.productservice.brand;
 
 import com.swagflow.productservice.brand.dto.CreateBrandDto;
 import com.swagflow.productservice.brand.dto.UpdateBrandDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Getter
 public class BrandServiceImpl implements BrandService {
 
     private final BrandRepository brandRepository;
@@ -36,7 +38,15 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public Brand findById(String id) {
-        UUID brandId = UUID.fromString(id);
+        UUID brandId;
+
+        try {
+            brandId = UUID.fromString(id);
+        }catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Invalid id");
+        }
+
+
         return brandRepository.findById(brandId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,String.format("Brand is not found with id : %s",id)));
@@ -65,5 +75,10 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public void delete(String id) {
 
+    }
+
+    @Override
+    public void clearAll() {
+        brandRepository.deleteAll();
     }
 }

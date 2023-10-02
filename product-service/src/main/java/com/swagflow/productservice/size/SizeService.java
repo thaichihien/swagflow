@@ -15,6 +15,7 @@ public interface SizeService {
     List<Size> getAllSizes();
 
     Size findById(Long id);
+    Size findByName(String name);
 
     Size update(UpdateSizeDto updateSizeDto);
 

@@ -20,7 +20,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+    show-sql: true
+    output:
+      ansi:
+        enabled: ALWAYS
+
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /api
+
+logging:
+  level:
+    root: INFO

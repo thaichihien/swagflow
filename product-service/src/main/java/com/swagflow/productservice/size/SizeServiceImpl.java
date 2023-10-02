@@ -3,6 +3,7 @@ package com.swagflow.productservice.size;
 import com.swagflow.productservice.category.Category;
 import com.swagflow.productservice.size.dto.CreateSizeDto;
 import com.swagflow.productservice.size.dto.UpdateSizeDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,11 @@ public class SizeServiceImpl implements SizeService{
     @Override
     public Size findById(Long id) {
         return sizeRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    public Size findByName(String name) {
+        return sizeRepository.findByName(name).orElseThrow();
     }
 
     @Override
