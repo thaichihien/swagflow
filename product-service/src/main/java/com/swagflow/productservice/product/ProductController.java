@@ -1,7 +1,6 @@
 package com.swagflow.productservice.product;
 
 import com.swagflow.productservice.product.dto.*;
-import com.swagflow.productservice.product.model.Product;
 import com.swagflow.productservice.utils.CSVService;
 import com.swagflow.productservice.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,16 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.http.ResponseEntity.badRequest;
 
 @Tag(name = "Product")
 @RestController
@@ -66,7 +59,7 @@ public class ProductController {
     @Operation(summary = "Get all products")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ProductResponsePagination getAllProductsForCustomer(
+    public ProductResponseOffsetPagination getAllProductsForCustomer(
             @RequestParam(defaultValue = "1")int page,
             @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit
             ){
@@ -78,6 +71,16 @@ public class ProductController {
         }
 
         return productService.getProducts(page,limit);
+    }
+
+    @Operation(summary = "Get all products")
+    @GetMapping("/cursor")
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponseCursorPagination getAllProductsForCustomerInfinity(
+            @RequestParam(required = false)String next,
+            @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit
+    ){
+        return productService.getProducts(next,limit);
     }
 
     @Operation(summary = "get product by id")

@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Table(indexes = @Index(name = "idx_created_at_uuid",columnList = "id,createdAt",unique = true))
 public class Product extends BaseEntity {
 
     @Id

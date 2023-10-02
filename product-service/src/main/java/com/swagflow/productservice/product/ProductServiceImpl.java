@@ -17,13 +17,13 @@ import com.swagflow.productservice.size.Size;
 import com.swagflow.productservice.size.SizeService;
 import com.swagflow.productservice.utils.CSVService;
 import com.swagflow.productservice.utils.Constants;
+import com.swagflow.productservice.utils.pagination.PageSpecification;
+import com.swagflow.productservice.utils.pagination.PaginationCursor;
+import com.swagflow.productservice.utils.pagination.PaginationCursorEncoderDecoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -109,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
                 tempBrand.put(brandString, brand);
             }
             double price = ExceptionHelper.Double.parseDoubleOrElseThrow(
-                    record.get(Constants.PRODUCT_CSV_HEADERS.price),"Invalid value at price column"
+                    record.get(Constants.PRODUCT_CSV_HEADERS.price), "Invalid value at price column"
             );
 
             Product created = Product.builder()
@@ -121,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
                     .build();
 
             List<ProductSize> productSizes = updateProductSizeOfProduct(record, created);
-            List<ProductImage> productImages = getImageFromColumn(record.get(Constants.PRODUCT_CSV_HEADERS.images),created);
+            List<ProductImage> productImages = getImageFromColumn(record.get(Constants.PRODUCT_CSV_HEADERS.images), created);
             sizes.addAll(productSizes);
             images.addAll(productImages);
 
@@ -163,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse findById(String id, boolean isAdmin) {
-        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id,ExceptionHelper.ServerErrorMessage.INVALID_ID);
+        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
 
         Product one = productRepository.getProduct().findById(uuid).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found with id")
@@ -197,7 +197,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse update(UpdateProductDto updateProductDto) {
-        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(updateProductDto.getId(),ExceptionHelper.ServerErrorMessage.INVALID_ID);
+        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(updateProductDto.getId(), ExceptionHelper.ServerErrorMessage.INVALID_ID);
         Product updated = productRepository.getProduct().findById(uuid).orElseThrow();
         updated.setName(updateProductDto.getName());
         updated.setDescription(updateProductDto.getDescription());
@@ -222,7 +222,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(String id) {
-        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id,ExceptionHelper.ServerErrorMessage.INVALID_ID);
+        UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
         productRepository.getProduct().deleteById(uuid);
     }
 
@@ -237,10 +237,11 @@ public class ProductServiceImpl implements ProductService {
     public void deleteAll() {
         productRepository.getProduct().deleteAll();
     }
+
     @Override
     public void deleteAll(boolean database) {
-       deleteAll();
-        if(database){
+        deleteAll();
+        if (database) {
             categoryService.clearAll();
             brandService.clearAll();
             //productRepository.getProductImage().deleteAll();
@@ -273,7 +274,7 @@ public class ProductServiceImpl implements ProductService {
 
         for (String sizeHeader : Constants.PRODUCT_CSV_HEADERS.sizes) {
             int quantity = ExceptionHelper.Integer.parseIntOrElseThrow(record.get(sizeHeader)
-                    ,String.format("Invalid value at column : %s",sizeHeader));
+                    , String.format("Invalid value at column : %s", sizeHeader));
 
             if (quantity <= 0) {
                 continue;
@@ -323,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private ProductResponse convertProductToProductResponse(Product product){
+    private ProductResponse convertProductToProductResponse(Product product) {
         List<ProductSizeResponse> sizeResponses = convertProductQuantity(product.getProductSizes());
 
         ProductResponse.builder().build();
@@ -362,13 +363,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private List<ProductImage> getImageFromColumn(String imageArray,Product product) {
+    private List<ProductImage> getImageFromColumn(String imageArray, Product product) {
         String[] imageUrls = imageArray.split(",");
         List<ProductImage> result = new LinkedList<>();
 
         for (String imgUrl : imageUrls) {
             if (!ImageService.isImageExtension(imgUrl)) {
-                throw new IllegalArgumentException(String.format("Invalid image url at product : %s",product.getName()));
+                throw new IllegalArgumentException(String.format("Invalid image url at product : %s", product.getName()));
             }
 
             ProductImage productImage = ProductImage.builder().url(imgUrl).product(product).build();
@@ -381,12 +382,12 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductResponsePagination getProducts(int page, int limit, Sort sort) {
+    public ProductResponseOffsetPagination getProducts(int page, int limit, Sort sort) {
 
-        Pageable pageable = PageRequest.of(page,limit,sort);
+        Pageable pageable = PageRequest.of(page, limit, sort);
 
         Page<Product> productPage = productRepository.getProduct().findAll(pageable);
-        return ProductResponsePagination.builder()
+        return ProductResponseOffsetPagination.builder()
                 .data(productPage.getContent().stream().map(this::convertProductToProductResponse).toList())
                 .currentPage(page)
                 .totalItems(productPage.getTotalElements())
@@ -395,7 +396,50 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponsePagination getProducts(int page, int limit) {
-        return getProducts(page,limit,Sort.by("updated_at").descending());
+    public ProductResponseOffsetPagination getProducts(int page, int limit) {
+        return getProducts(page, limit, Sort.by("updated_at").descending());
+    }
+
+    @Override
+    public ProductResponseCursorPagination getProducts(String nextCursor, int limit) {
+
+        Sort cursorSort = Sort.by(
+                Sort.Order.desc("createdAt"),
+                Sort.Order.desc("id")
+        );
+        Slice<Product> products;
+        if (nextCursor == null) {
+            products = productRepository.getProduct().findAll(
+                    PageRequest.of(0, limit, cursorSort));
+        } else {
+            PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
+
+            PageSpecification<Product> specification = new PageSpecification<>(
+                    paginationCursor.getCreatedAt(),
+                    paginationCursor.getId()
+            );
+            products = productRepository.getProduct().findAll(specification, PageRequest.of(0, limit, cursorSort));
+        }
+
+
+        if (!products.hasContent()) {
+            return ProductResponseCursorPagination.builder()
+                    .data(List.of())
+                    .build();
+        }
+
+        List<Product> data = products.getContent();
+        String nextCursorKey = PaginationCursorEncoderDecoder.encode(
+                new PaginationCursor(
+                        data.get(data.size() - 1).getCreatedAt(),
+                        data.get(data.size() - 1).getId()
+                )
+        );
+
+        return ProductResponseCursorPagination.builder()
+                .nextPageCursor(nextCursorKey)
+                .previousPageCursor(null)
+                .data(data.stream().map(this::convertProductToProductResponse).toList())
+                .build();
     }
 }

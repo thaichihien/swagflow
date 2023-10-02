@@ -33,3 +33,7 @@ springdoc:
 logging:
   level:
     root: INFO
+
+pagination:
+  cursor:
+    key: secret_key

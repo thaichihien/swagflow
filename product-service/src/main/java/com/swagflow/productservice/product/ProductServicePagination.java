@@ -1,11 +1,14 @@
 package com.swagflow.productservice.product;
 
-import com.swagflow.productservice.product.dto.ProductResponsePagination;
+import com.swagflow.productservice.product.dto.ProductResponseCursorPagination;
+import com.swagflow.productservice.product.dto.ProductResponseOffsetPagination;
 import org.springframework.data.domain.Sort;
 
 public interface ProductServicePagination {
 
-    ProductResponsePagination getProducts(int page, int limit, Sort sort);
-    ProductResponsePagination getProducts(int page, int limit);
+    ProductResponseOffsetPagination getProducts(int page, int limit, Sort sort);
+    ProductResponseOffsetPagination getProducts(int page, int limit);
+
+    ProductResponseCursorPagination getProducts(String nextCursor,int limit);
 
 }
