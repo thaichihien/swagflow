@@ -13,6 +13,7 @@ import com.swagflow.productservice.product.model.Product;
 import com.swagflow.productservice.product.model.ProductImage;
 import com.swagflow.productservice.product.model.ProductSize;
 import com.swagflow.productservice.product.repositories.DataRepository;
+import com.swagflow.productservice.product.repositories.ProductSpecification;
 import com.swagflow.productservice.size.Size;
 import com.swagflow.productservice.size.SizeService;
 import com.swagflow.productservice.utils.CSVService;
@@ -24,12 +25,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Transactional
     public ProductResponse create(CreateProductDto createProductDto) {
 
         Category category = categoryService.findById(createProductDto.getCategoryId());
@@ -66,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductSizeResponse> sizeResponses = convertProductQuantity(sizes, false);
 
-        return ProductResponse
+        return ProductFullResponse
                 .builder()
                 .id(created.getId())
                 .name(created.getName())
@@ -79,6 +85,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Integer importProducts(MultipartFile file) {
 
         HashMap<String, Category> tempCategory = new HashMap<>();
@@ -326,10 +333,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductResponse convertProductToProductResponse(Product product) {
         List<ProductSizeResponse> sizeResponses = convertProductQuantity(product.getProductSizes());
-
-        ProductResponse.builder().build();
-
-        return (ProductResponse) ProductResponse.builder()
+        return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
@@ -337,6 +341,19 @@ public class ProductServiceImpl implements ProductService {
                 .category(product.getCategory().getName())
                 .brand(product.getBrand().getName())
                 .sizes(sizeResponses)
+                .images(product.getImages().stream().map(ProductImage::getUrl).toList())
+                .build();
+    }
+
+    private SimpleProductResponse convertProductToSimpleProductResponse(Product product) {
+        //List<ProductSizeResponse> sizeResponses = convertProductQuantity(product.getProductSizes());
+
+        return SimpleProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .category(product.getCategory().getName())
+                .brand(product.getBrand().getName())
                 .images(product.getImages().stream().map(ProductImage::getUrl).toList())
                 .build();
     }
@@ -403,17 +420,22 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseCursorPagination getProducts(String nextCursor, int limit) {
 
+        // default sort by id and createdAt (for cursor pagination)
         Sort cursorSort = Sort.by(
                 Sort.Order.desc("createdAt"),
                 Sort.Order.desc("id")
         );
         Slice<Product> products;
+
+        // nextCursor == null meaning this is the first page
         if (nextCursor == null) {
             products = productRepository.getProduct().findAll(
                     PageRequest.of(0, limit, cursorSort));
         } else {
+            // Get createdAt and id from nextCursor string
             PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
 
+            // Create specification with createdAt and id
             PageSpecification<Product> specification = new PageSpecification<>(
                     paginationCursor.getCreatedAt(),
                     paginationCursor.getId()
@@ -439,7 +461,58 @@ public class ProductServiceImpl implements ProductService {
         return ProductResponseCursorPagination.builder()
                 .nextPageCursor(nextCursorKey)
                 .previousPageCursor(null)
-                .data(data.stream().map(this::convertProductToProductResponse).toList())
+                .data(data.stream().map(this::convertProductToSimpleProductResponse).toList())
+                .build();
+    }
+
+    @Override
+    public ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category) {
+
+        // default sort by id and createdAt (for cursor pagination)
+        Sort cursorSort = Sort.by(
+                Sort.Order.desc("createdAt"),
+                Sort.Order.desc("id")
+        );
+        Slice<Product> products;
+
+        // nextCursor == null meaning this is the first page
+        if (nextCursor == null) {
+            Specification<Product> belongsToCategory = ProductSpecification.belongsToCategory(category);
+            products = productRepository.getProduct().findAll(belongsToCategory,
+                    PageRequest.of(0, limit, cursorSort));
+        } else {
+            // Get createdAt and id from nextCursor string
+            PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
+
+            // Create specification with createdAt and id
+            PageSpecification<Product> specification = new PageSpecification<>(
+                    paginationCursor.getCreatedAt(),
+                    paginationCursor.getId()
+            );
+
+            Specification<Product> belongsToCategory = ProductSpecification.belongsToCategory(category);
+            products = productRepository.getProduct().findAll(where(specification).and(belongsToCategory), PageRequest.of(0, limit, cursorSort));
+        }
+
+
+        if (!products.hasContent()) {
+            return ProductResponseCursorPagination.builder()
+                    .data(List.of())
+                    .build();
+        }
+
+        List<Product> data = products.getContent();
+        String nextCursorKey = PaginationCursorEncoderDecoder.encode(
+                new PaginationCursor(
+                        data.get(data.size() - 1).getCreatedAt(),
+                        data.get(data.size() - 1).getId()
+                )
+        );
+
+        return ProductResponseCursorPagination.builder()
+                .nextPageCursor(nextCursorKey)
+                .previousPageCursor(null)
+                .data(data.stream().map(this::convertProductToSimpleProductResponse).toList())
                 .build();
     }
 }

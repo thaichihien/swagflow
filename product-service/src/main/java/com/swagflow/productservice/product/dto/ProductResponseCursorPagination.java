@@ -14,5 +14,5 @@ public class ProductResponseCursorPagination {
     private String nextPageCursor;
     @JsonProperty("previous_page")
     private String previousPageCursor;
-    private List<ProductResponse> data;
+    private List<SimpleProductResponse> data;
 }

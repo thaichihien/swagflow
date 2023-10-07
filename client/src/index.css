@@ -114,9 +114,53 @@ padding-right: 9px; */
 }
 
 .category-block-wrapper {
-  background-color: aqua;
-  height: 50vh;
+  
+  position: relative;
 }
+
+.category-block-wrapper h4{
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-family: "Satisfy", cursive;
+  transition: all 0.5s;
+}
+
+.category-block-wrapper:hover h4{
+  color: white;
+  font-size: 2.5rem;
+}
+
+.category-block-wrapper:hover .category-block-bg{
+  filter: brightness(0.2);
+ 
+}
+
+
+.category-block-bg{
+  height: 50vh;
+  background-size: cover;
+  filter: brightness(0.4);
+  transition: all 0.5s;
+}
+
+
+#tshirts-block{
+  background-image: url('/images/tshirt_block.jpg');
+}
+#jeans-block{
+  background-image: url('/images/jean_block.jpg');
+}
+#sweatpants-block{
+  background-image: url('/images/sweatpant_block.jpg');
+}
+#jackets-block{
+  background-image: url('/images/jacket_block.jpg');
+}
+
 
 /* ---------------Product Slider ----------*/
 
@@ -175,6 +219,10 @@ padding-right: 9px; */
 #featureContainer .carousel-inner .carousel-item-start {
   transform: translateX(0);
 }
+#featureContainer .carousel-inner {
+  margin-top: 5rem;
+}
+
 #featureContainer .card {
   border: 0;
 }
@@ -194,8 +242,8 @@ padding-right: 9px; */
   padding: 3px 6px 3px 6px;
 }
 #featureContainer .indicator:hover {
-  background-color: blue;
-  border: 1px solid blue;
+  background-color: var(--dark-green);
+  border: 1px solid var(--dark-green);
   transition: 200ms;
 }
 #featureContainer .indicator:hover {
@@ -208,6 +256,8 @@ padding-right: 9px; */
 #featureContainer .float-end {
   padding-top: 10px;
 }
+
+
 
 /* ----------------------------- */
 
@@ -269,8 +319,16 @@ footer h4 {
 }
 
 .product-card img {
-  height: 17rem;
+  height: 20rem;
   width: 17rem;
+}
+
+.product-card .card-title{
+  white-space: nowrap; 
+  width: 15rem; 
+  overflow: hidden;
+  font-weight: bold;
+  text-overflow: ellipsis; 
 }
 
 .product-image-wrapper {

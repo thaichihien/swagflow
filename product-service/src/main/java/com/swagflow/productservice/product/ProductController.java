@@ -21,7 +21,6 @@ import java.util.List;
 @Slf4j
 public class ProductController {
     private final ProductService productService;
-    private final CSVService csvService;
 
     @Operation(summary = "Create a product")
     @PostMapping
@@ -57,7 +56,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Get all products")
-    @GetMapping
+    @GetMapping("/offset")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponseOffsetPagination getAllProductsForCustomer(
             @RequestParam(defaultValue = "1")int page,
@@ -74,17 +73,22 @@ public class ProductController {
     }
 
     @Operation(summary = "Get all products")
-    @GetMapping("/cursor")
+    @GetMapping("/{category}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponseCursorPagination getAllProductsForCustomerInfinity(
+            @PathVariable String category,
             @RequestParam(required = false)String next,
             @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit
     ){
-        return productService.getProducts(next,limit);
+
+        if(category.equals("all")){
+            return  productService.getProducts(next,limit);
+        }
+        return productService.getProducts(next,limit,category);
     }
 
     @Operation(summary = "get product by id")
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getProductWithId(@PathVariable String id,@RequestParam String view){
 

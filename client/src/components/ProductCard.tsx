@@ -2,14 +2,19 @@ import React from "react"
 
 import {BsFillCartPlusFill,BsFillSuitHeartFill } from 'react-icons/bs'
 
-type Props = {}
+type Props = {
+  src : string
+  title: string
+  brand: string
+  price: number
+}
 
 const ProductCard = (props: Props) => {
   return (
     <div className="card product-card">
     <div className="product-image-wrapper">
     <img
-        src="https://images.meesho.com/images/products/51101648/vwud0_512.webp"
+        src={props.src}
         className="card-img-top"
         alt="..."
       />
@@ -17,10 +22,10 @@ const ProductCard = (props: Props) => {
       <button className="btn btn-on-product btn-add-cart"><BsFillCartPlusFill/></button>
     </div>
       <div className="card-body">
-        <h4 className="card-title fw-bold">Card title</h4>
+        <h4 className="card-title fw-bold">{props.title}</h4>
         <div className="d-flex justify-content-between">
-          <p className="card-text fs-6">Some Brand</p>
-          <p className="card-text fs-6">150.000 VND</p>
+          <p className="card-text fs-6">{props.brand}</p>
+          <p className="card-text fs-6">{props.price} EUR</p>
         </div>
       </div>
     </div>

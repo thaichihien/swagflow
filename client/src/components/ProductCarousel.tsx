@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, forwardRef, ForwardedRef } from "react"
+import ProductCard from "./ProductCard"
+import { Product } from "../interfaces/product"
+import { AiOutlineArrowRight, AiOutlineArrowLeft } from "react-icons/ai"
 
-// Chúng ta định nghĩa kiểu cho ref của phần tử
 type MyCarouselProps = {
-  // Thuộc tính khác của phần tử
+  products: Product[]
 }
 
-// Chúng ta sử dụng forwardRef để xử lý ref
 const ProductCarousel = forwardRef(
   (props: MyCarouselProps, ref: ForwardedRef<HTMLDivElement>) => {
     const carouselRef = useRef<HTMLDivElement>(null)
@@ -28,10 +29,10 @@ const ProductCarousel = forwardRef(
           }
         })
       }
-    }, [])
+    }, [props.products])
 
     return (
-      <div ref={carouselRef  as ForwardedRef<HTMLDivElement>}>
+      <div ref={carouselRef as ForwardedRef<HTMLDivElement>}>
         <div className="container my-3 mt-2" id="featureContainer">
           <div className="row mx-auto my-auto justify-content-center">
             <div
@@ -46,7 +47,7 @@ const ProductCarousel = forwardRef(
                   role="button"
                   data-bs-slide="prev"
                 >
-                  Left Arrow Here
+                  <AiOutlineArrowLeft />
                 </a>{" "}
                 &nbsp;&nbsp;
                 <a
@@ -55,42 +56,44 @@ const ProductCarousel = forwardRef(
                   role="button"
                   data-bs-slide="next"
                 >
-                  Right Arrow Here
+                  <AiOutlineArrowRight />
                 </a>
               </div>
 
               <div className="carousel-inner" role="listbox">
-                <div className="carousel-item active">
+                {/* <div className="carousel-item active">
                   <div className="col-md-3">
-                    <div className="card">
-                      <div className="card-img">
-                        <img src="img1.jpg" className="img-fluid" />
-                      </div>
-                      <div className="card-img-overlays">Slide 1</div>
-                    </div>
+                    <ProductCard
+                      src="https://images.meesho.com/images/products/51101648/vwud0_512.webp"
+                      title="Product title 1"
+                      brand="Some brand"
+                      price={10.5}
+                    />
                   </div>
-                </div>
-                <div className="carousel-item">
-                  <div className="col-md-3">
-                    <div className="card">
-                      <div className="card-img">
-                        <img src="img2.jpg" className="img-fluid" />
+                </div> */}
+                {props.products.map((product, index) => {
+                  let cover = ""
+                  if (product.images.length > 0) {
+                    cover = product.images[0]
+                  }
+
+                  return (
+                    <div
+                      className={
+                        index == 0 ? "carousel-item active" : "carousel-item"
+                      }
+                    >
+                      <div className="col-md-3">
+                        <ProductCard
+                          src={cover}
+                          title={product.name}
+                          brand={product.brand}
+                          price={product.price}
+                        />
                       </div>
-                      <div className="card-img-overlays">Slide 2</div>
                     </div>
-                  </div>
-                </div>
-                <div className="carousel-item">
-                  <div className="col-md-3">
-                    <div className="card">
-                      <div className="card-img">
-                        <img src="img3.jpg" className="img-fluid" />
-                      </div>
-                      <div className="card-img-overlays">Slide 3</div>
-                    </div>
-                  </div>
-                </div>
-                
+                  )
+                })}
               </div>
             </div>
           </div>
