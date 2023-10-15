@@ -2,6 +2,7 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import * as cookieParser from 'cookie-parser';
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,8 +21,8 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-  
-  
+  app.use(cookieParser())
+  app.enableCors()
   await app.listen(PORT);
   console.log(`listening at http://localhost:${PORT}`);
 }

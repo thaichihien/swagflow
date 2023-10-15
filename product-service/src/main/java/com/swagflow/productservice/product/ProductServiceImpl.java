@@ -466,7 +466,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category) {
+    public ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category,List<String> brands) {
 
         // default sort by id and createdAt (for cursor pagination)
         Sort cursorSort = Sort.by(
@@ -475,23 +475,32 @@ public class ProductServiceImpl implements ProductService {
         );
         Slice<Product> products;
 
+
+        Specification<Product> finalSpecification = where(ProductSpecification.belongsToCategory(category));
+        if(brands != null && !brands.isEmpty()){
+
+            finalSpecification = finalSpecification.and(ProductSpecification.inTheseBrand(brands));
+        }
+
+
         // nextCursor == null meaning this is the first page
         if (nextCursor == null) {
-            Specification<Product> belongsToCategory = ProductSpecification.belongsToCategory(category);
-            products = productRepository.getProduct().findAll(belongsToCategory,
+
+            products = productRepository.getProduct().findAll(finalSpecification,
                     PageRequest.of(0, limit, cursorSort));
         } else {
             // Get createdAt and id from nextCursor string
             PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
 
             // Create specification with createdAt and id
-            PageSpecification<Product> specification = new PageSpecification<>(
+            PageSpecification<Product> cursorSpecification = new PageSpecification<>(
                     paginationCursor.getCreatedAt(),
                     paginationCursor.getId()
             );
 
-            Specification<Product> belongsToCategory = ProductSpecification.belongsToCategory(category);
-            products = productRepository.getProduct().findAll(where(specification).and(belongsToCategory), PageRequest.of(0, limit, cursorSort));
+            finalSpecification= finalSpecification.and(cursorSpecification);
+
+            products = productRepository.getProduct().findAll(finalSpecification, PageRequest.of(0, limit, cursorSort));
         }
 
 

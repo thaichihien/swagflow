@@ -5,12 +5,15 @@ import About from "./pages/About"
 import Products from "./pages/Products"
 import Contact from "./pages/Contact"
 import Playground from "./pages/Playground"
+import Authentication from "./pages/Authentication"
+
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/auth" element={<Authentication />}/>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -19,6 +22,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/playground" element={<Playground />} />
           </Route>
+
           <Route path="*" element={<h1>Not found</h1>} />
         </Routes>
       </BrowserRouter>

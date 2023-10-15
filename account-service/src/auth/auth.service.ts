@@ -16,7 +16,7 @@ import { JwtPayLoad } from './interfaces/jwt.payload';
 export class AuthService {
   private readonly ACCESS_EXPIRE_TIME = '1h';
   private readonly REFRESH_EXPIRE_TIME = '7d';
-  private readonly logger = new Logger(AuthService.name)
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly jwtService: JwtService,
@@ -28,8 +28,7 @@ export class AuthService {
     signUpDto: SignUpDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     // - check exist
-    const existedCustomer = await this.customerService.findOneByUsername(
-      signUpDto.username,
+    const existedCustomer = await this.customerService.findOneByEmail(
       signUpDto.email,
     );
 
@@ -43,10 +42,7 @@ export class AuthService {
     const newAccount = await this.customerService.create(signUpDto);
 
     // - generate tokens
-    const tokens = await this.generateTokens(
-      newAccount.id,
-      newAccount.username,
-    );
+    const tokens = await this.generateTokens(newAccount.id, newAccount.email);
 
     // - update refresh token
     await this.updateRefreshToken(newAccount.id, tokens.refreshToken);
@@ -58,9 +54,8 @@ export class AuthService {
     signInDto: SignInDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     // - check exist
-    const existedCustomer = await this.customerService.findOneByUsername(
-      signInDto.username,
-      signInDto.username,
+    const existedCustomer = await this.customerService.findOneByEmail(
+      signInDto.email,
     );
 
     if (!existedCustomer) {
@@ -75,7 +70,7 @@ export class AuthService {
     // - generate tokens
     const tokens = await this.generateTokens(
       existedCustomer.id,
-      existedCustomer.username,
+      existedCustomer.email,
     );
 
     // - update refresh tokens
@@ -90,7 +85,6 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     // - check exits and refresh token
 
-    
     const existedCustomer = await this.customerService.findOneByID(id);
 
     if (!existedCustomer || !existedCustomer.refreshToken) {
@@ -105,7 +99,7 @@ export class AuthService {
     // - generate tokens
     const tokens = await this.generateTokens(
       existedCustomer.id,
-      existedCustomer.username,
+      existedCustomer.email,
     );
 
     // - update refresh tokens

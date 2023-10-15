@@ -1,14 +1,44 @@
 import { Link } from "react-router-dom"
 import { BsSearch, BsPersonFill, BsCart2 } from "react-icons/bs"
 import { IoMdClose } from "react-icons/io"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "../app/hooks"
+import {
+  logOut,
+  selectCurrentToken,
+  selectCurrentUser,
+  setProfile,
+} from "../features/auth/authenticationSlice"
+import { useProfileMutation } from "../features/auth/authenticationApiSlice"
 
 function Header() {
   const [searching, setSearching] = useState(false)
 
+  const token = useAppSelector(selectCurrentToken)
+  const profile = useAppSelector(selectCurrentUser)
+  console.log(`token : ${token}`)
+  const dispatch = useAppDispatch()
+  const [getProfile] = useProfileMutation()
+
+  useEffect(() => {
+    if (token && !profile) {
+      // call "customer/profile"
+      getProfile()
+        .unwrap()
+        .then((res) => {
+          console.log(res)
+          dispatch(setProfile(res))
+        })
+    }
+  }, [])
+
   function switchToSearch(event: any): void {
     event.preventDefault()
     setSearching(!searching)
+  }
+
+  function handleLogOut(): void {
+    dispatch(logOut())
   }
 
   return (
@@ -105,8 +135,48 @@ function Header() {
                   </div>
                 </li>
                 <li>
-                  <div className="header-icon">
-                    <BsPersonFill className="fs-4" />
+                  <div className="header-icon dropdown">
+                    <BsPersonFill
+                      className="fs-4 dropdown-toggle"
+                      id="dropdownMenuLink"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    />
+                    <ul
+                      className="dropdown-menu account-menu"
+                      aria-labelledby="dropdownMenuLink"
+                    >
+                      {token == null ? (
+                        <>
+                          <li>
+                            <Link className="dropdown-item" to="/auth">
+                              Sign In
+                            </Link>
+                          </li>
+                          <li>
+                            <Link className="dropdown-item" to="/auth">
+                              Sign Up
+                            </Link>
+                          </li>
+                        </>
+                      ) : (
+                        <>
+                          <li>
+                            <div className="dropdown-item">
+                              Welcome, {profile?.firstName}
+                            </div>
+                          </li>
+                          <li>
+                            <div
+                              className="dropdown-item"
+                              onClick={handleLogOut}
+                            >
+                              Log out
+                            </div>
+                          </li>
+                        </>
+                      )}
+                    </ul>
                   </div>
                 </li>
                 <li>

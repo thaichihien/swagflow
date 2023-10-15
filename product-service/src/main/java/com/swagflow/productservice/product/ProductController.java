@@ -78,13 +78,18 @@ public class ProductController {
     public ProductResponseCursorPagination getAllProductsForCustomerInfinity(
             @PathVariable String category,
             @RequestParam(required = false)String next,
-            @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit
+            @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit,
+            @RequestParam(name = "brand",required = false)List<String> brands
     ){
 
         if(category.equals("all")){
             return  productService.getProducts(next,limit);
         }
-        return productService.getProducts(next,limit,category);
+
+
+
+
+        return productService.getProducts(next,limit,category,brands);
     }
 
     @Operation(summary = "get product by id")

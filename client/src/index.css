@@ -84,6 +84,10 @@ button {
   color: var(--dark-gold);
 }
 
+.account-menu{
+  transform: translate(-45px, 35px) !important;
+}
+
 .lblCartCount {
   font-size: 12px;
   background: var(--light-gold);
@@ -160,6 +164,9 @@ padding-right: 9px; */
 #jackets-block{
   background-image: url('/images/jacket_block.jpg');
 }
+
+
+
 
 
 /* ---------------Product Slider ----------*/
@@ -365,3 +372,81 @@ footer h4 {
 }
 
 /* --------------------------- */
+/* ------------Authentication ------------------ */
+
+.authentication-background{
+  background-color: var(--dark-green);
+  padding-bottom: 50px;
+  padding-top: 30px;
+}
+
+.login-background{
+  height: 100vh;
+}
+
+.register-background{
+  padding-bottom: 10vh;
+}
+
+
+
+/* ---------------Authentication ---------- */
+.forms {
+  background: #fff;
+  box-shadow: 0 0 5px #000;
+  margin: 30px auto;
+  max-width: 500px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+.forms h3 {
+  padding: 0 0 20px 0;
+  /* font-size: 26px;
+	color: #666; */
+  font-weight: lighter;
+  text-align: center;
+}
+.forms form {
+  padding: 30px;
+}
+#signup {
+  display: none;
+}
+.forms .tab-group {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.forms .tab-group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.forms .tab-group li a {
+  display: block;
+  text-decoration: none;
+  padding: 15px;
+  background: #e5e6e7;
+  color: #888;
+  /* font-size: 20px; */
+  float: left;
+  width: 50%;
+  text-align: center;
+  border-top: 3px solid transparent;
+  -moz-transition: all 0.4s ease-in-out;
+  -o-transition: all 0.4s ease-in-out;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+.forms .tab-group li a:hover {
+  background: #dedfdf;
+  color: #666;
+}
+.forms .tab-group .active a {
+  background: #fff;
+  color: #444;
+  border-top: 5px solid var(--dark-gold);
+}
+
+/* --------------------------------------- */

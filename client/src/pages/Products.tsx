@@ -4,50 +4,139 @@ import { Product } from "../interfaces/product"
 import { ServerConfig } from "../config/env"
 import RadioFilter from "../components/RadioFilter"
 import { SimplePair } from "../interfaces/simplepair"
-import { useNavigate, useParams } from "react-router-dom"
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom"
+import CheckboxFilter from "../components/CheckboxFilter"
+import axios from "../api/axios"
 
 function Products() {
-
   const navigate = useNavigate()
 
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<SimplePair[]>([])
+  const [brands, setBrands] = useState<SimplePair[]>([])
   let nextPage = ""
 
+  let { category } = useParams()
+  let brandFilters: string[] = []
+  const [searchParams] = useSearchParams()
+  for (const entry of searchParams.entries()) {
+    const [param, value] = entry
 
-  let {category} = useParams()
+    if (param === "brand") {
+      brandFilters.push(value)
+    }
+  }
 
+  function getApiUrlFilter(): string {
+    const apiPath = `/product/${category}?`
+    let queryFilterParams: string[] = []
 
+    queryFilterParams.push("limit=9")
+
+    if (brandFilters.length > 0) {
+      const brandQuery: string[] = []
+      brandFilters.forEach((b) => {
+        brandQuery.push(`brand=${b}`)
+      })
+
+      queryFilterParams = [...queryFilterParams, ...brandQuery]
+    }
+
+    return apiPath + queryFilterParams.join("&")
+  }
+
+  function getUrlFilter(): string {
+    let apiPath = `/products/${category}`
+    let queryFilterParams: string[] = []
+
+    //queryFilterParams.push('limit=9')
+
+    if (brandFilters.length > 0) {
+      apiPath += "?"
+      const brandQuery: string[] = []
+      brandFilters.forEach((b) => {
+        brandQuery.push(`brand=${b}`)
+      })
+
+      queryFilterParams = [...queryFilterParams, ...brandQuery]
+    }
+
+    return apiPath + queryFilterParams.join("&")
+  }
 
   useEffect(() => {
     fetchProducts()
-    fetchCategories()
+    fetchFilters()
   }, [category])
 
   async function fetchProducts() {
-    
-    if(!category){
+    if (!category) {
       category = "all"
     }
-    console.log(category);
-    const res = await fetch(ServerConfig.endpoint(`/product/${category}?limit=9`))
-    const resJson = await res.json()
-    nextPage = resJson["next_page"]
-    setProducts(resJson.data)
+
+    try {
+      const res = await axios.get(getApiUrlFilter())
+
+      if (res.status === 200) {
+        const resJson = JSON.parse(res.data)
+        nextPage = resJson["next_page"]
+        setProducts(resJson.data)
+      } else {
+        console.log("fetch error at fetchProducts ", res)
+      }
+    } catch (error) {
+      console.log("fetch error at fetchProducts ", error)
+    }
   }
 
-  async function fetchCategories() {
+  async function fetchFilters() {
     if (categories.length <= 0) {
-      const res = await fetch(ServerConfig.endpoint("/category"))
-      const resJson = await res.json()
-     
-      setCategories(resJson)
+      try {
+        const res = await axios.get("/category")
+        if (res.status === 200) {
+          const resJson = JSON.parse(res.data)
+          setCategories(resJson)
+        } else {
+          console.log("fetch error at fetchFilters ", res)
+        }
+      } catch (error) {
+        console.log("fetch error at fetchFilters ", error)
+      }
+    }
+
+    if (brands.length <= 0) {
+      try {
+        const res = await axios.get("/brand")
+        if (res.status === 200) {
+          const resJson = JSON.parse(res.data)
+          setBrands(resJson)
+        } else {
+          console.log("fetch error at fetchFilters ", res)
+        }
+      } catch (error) {
+        console.log("fetch error at fetchFilters ", error)
+      }
     }
   }
 
   function handleCategory(value: string): void {
     category = value
-    navigate(`/products/${value}`)
+    navigate(getUrlFilter())
+  }
+
+  function handleBrand(checked: boolean, value: string): void {
+    if (checked) {
+      brandFilters.push(value)
+    } else {
+      brandFilters = brandFilters.filter((b) => b !== value)
+    }
+    navigate(getUrlFilter())
+    fetchProducts()
   }
 
   return (
@@ -56,64 +145,20 @@ function Products() {
         <section className="filter-side-bar">
           <div className="card">
             <div className="card-body">
-              <RadioFilter<SimplePair>  radioList={categories} onChange={handleCategory} />
+              <RadioFilter<SimplePair>
+                radioList={categories}
+                onChange={handleCategory}
+                selected={category}
+              />
             </div>
           </div>
           <div className="card mt-4">
             <div className="card-body">
-              <div className="filter-section">
-                <h5 className="fw-bold">Brands</h5>
-                <ul>
-                  <li>
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        value=""
-                        id="flexCheckDefault-1"
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="flexCheckDefault-1"
-                      >
-                        Default checkbox
-                      </label>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        value=""
-                        id="flexCheckDefault-2"
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="flexCheckDefault-2"
-                      >
-                        Default checkbox
-                      </label>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        value=""
-                        id="flexCheckDefault-3"
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="flexCheckDefault-3"
-                      >
-                        Default checkbox
-                      </label>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+              <CheckboxFilter<SimplePair>
+                checkboxList={brands}
+                onChange={handleBrand}
+                selectedList={brandFilters}
+              />
             </div>
           </div>
         </section>

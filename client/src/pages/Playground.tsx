@@ -1,7 +1,14 @@
 import ProductCarousel from "../components/ProductCarousel"
 
 function Playground() {
-  return <></>
+  return (
+    <>
+      
+
+
+      
+    </>
+  )
 }
 
 export default Playground

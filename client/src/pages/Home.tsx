@@ -4,6 +4,7 @@ import ProductCarousel from "../components/ProductCarousel"
 import { useEffect, useState } from "react"
 import { Product } from "../interfaces/product"
 import { ServerConfig } from "../config/env"
+import axios from "../api/axios"
 
 function Home() {
   const [products, setProducts] = useState<Product[]>([])
@@ -13,26 +14,31 @@ function Home() {
   }, [])
 
   async function fetchNewProducts() {
-    const res = await fetch(ServerConfig.endpoint("/product/cursor?limit=6"))
+    try {
+      const res = await axios.get("/product/all?limit=6")
 
-    const resJson = await res.json()
-    
-    setProducts(resJson.data)
+      if(res.status == 200){
+        const resJson = JSON.parse(res.data)
+        setProducts(resJson.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
     <>
       <Banner />
-      <section style={{ marginTop: "8rem" }}>
-        <div className="container d-flex justify-content-center mt-5">
+      <section style={{ paddingTop: "6rem",paddingBottom : "6rem",backgroundColor: "white" }}>
+        <div className="container d-flex justify-content-center">
           <div className="d-flex flex-column align-items-center">
             <h2 className="fw-bold">New Arrivals</h2>
-            <Link to="#">View more</Link>
+            <Link to="/products/all">View more</Link>
           </div>
         </div>
         <ProductCarousel products={products} />
       </section>
-      <section style={{ marginTop: "8rem" }}>
+      <section >
         <div className="row g-0">
           <div className="col">
             <div className="category-block-wrapper">

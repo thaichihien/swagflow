@@ -7,12 +7,14 @@ type RequiredProp = {
 
 type Props<T extends RequiredProp> = {
   radioList: T[]
-  onChange: (value: string | "all") => void
+  onChange: (value: string | "all") => void,
+  selected: string | undefined
 }
 
 function RadioFilter<T extends RequiredProp>({
   radioList,
   onChange,
+  selected
 }: Props<T>) {
   const handleRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value)
@@ -31,6 +33,7 @@ function RadioFilter<T extends RequiredProp>({
               id="flexRadioDefault1"
               value="all"
               onChange={handleRadioChange}
+              checked={selected === "all"}
             />
             <label className="form-check-label" htmlFor="flexRadioDefault1">
               All
@@ -48,6 +51,7 @@ function RadioFilter<T extends RequiredProp>({
                   id={item.id}
                   value={item.name}
                   onChange={handleRadioChange}
+                  checked={item.name === selected}
                 />
                 <label className="form-check-label" htmlFor={item.id}>
                   {item.name}

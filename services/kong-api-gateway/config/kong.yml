@@ -1,0 +1,31 @@
+_format_version: "1.1"
+
+services:
+- name: auth-service
+  url: http://host.docker.internal:3000/auth
+  routes:
+  - name: auth-route
+    paths:
+    - /auth
+- name: my-server
+  url: http://host.docker.internal:3000/account
+  routes:
+  - name: account-route
+    paths:
+    - /account
+    plugins:
+    - name: jwt
+      enabled: true
+      config:
+        key_claim_name: iss
+
+
+
+consumers:
+- username: my-username
+
+jwt_secrets:
+- consumer: my-username
+  key: test-key
+  secret: Hien
+

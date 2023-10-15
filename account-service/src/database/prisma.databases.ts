@@ -6,12 +6,14 @@ import { CustomerRepository } from './customer.repository';
 
 @Injectable()
 export class PrismaDatabases implements IDataServices, OnApplicationBootstrap {
+  constructor(private readonly prismaService: PrismaService) {}
   customer: IRepository<{
     id: string;
-    username: string;
     email: string;
     password: string;
-    fullname: string;
+    firstName: string;
+    lastName: string;
+    dob: Date;
     phone: string;
     refreshToken: string;
     createdAt: Date;
@@ -26,9 +28,7 @@ export class PrismaDatabases implements IDataServices, OnApplicationBootstrap {
     createdAt: Date;
     updatedAt: Date;
   }>;
-
-  constructor(private readonly prismaService: PrismaService) {}
-  onApplicationBootstrap() { 
+  onApplicationBootstrap() {
     this.customer = new CustomerRepository(this.prismaService);
   }
 }

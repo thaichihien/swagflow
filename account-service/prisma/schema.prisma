@@ -12,10 +12,11 @@ datasource db {
 
 model Customer {
   id           String    @id @default(uuid()) @db.Uuid
-  username     String    @unique
-  email        String
+  email        String    @unique
   password     String
-  fullname     String
+  firstName    String
+  lastName     String
+  dob          DateTime  @db.Date
   phone        String?
   refreshToken String?
   createdAt    DateTime  @default(now())
