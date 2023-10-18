@@ -6,6 +6,8 @@ services:
     imgbb:
       url: https://api.imgbb.com/1
       key: df7a42601487b2a866a68765d07d9ec2
+  rabbitmq:
+    exchange-name: swagflow
 
 spring:
   datasource:
@@ -25,6 +27,14 @@ spring:
     output:
       ansi:
         enabled: ALWAYS
+    rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+      publisher-confirm-type: correlated
+      publisher-returns: true
+
 
 springdoc:
   swagger-ui:
@@ -38,3 +48,6 @@ logging:
 pagination:
   cursor:
     key: secret_key
+
+
+

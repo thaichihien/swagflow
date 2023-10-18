@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Cart, CartSchema } from 'src/cart/schemas/cart.schema';
 import { IDataServices } from './database.interface';
 import { MongoDatabases } from './mongo.databases';
+import { CartItem } from 'src/cart/schemas/cart-item.schema';
 
 // way to change database
 // - 1 implement IRepository for suitable database
@@ -14,7 +15,7 @@ import { MongoDatabases } from './mongo.databases';
   imports: [
     MongooseModule.forFeature([
       { name: Cart.name, schema: CartSchema },
-    
+      
     ]),
   ],
   providers: [

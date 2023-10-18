@@ -167,7 +167,9 @@ export class AuthService {
   }
 
   async decodeToken(token: string) {
-    var payload = this.jwtService.decode(token);
+    const payload: JwtPayLoad = await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>('ACCESS_SECRET'),
+    });
     return payload;
   }
 }

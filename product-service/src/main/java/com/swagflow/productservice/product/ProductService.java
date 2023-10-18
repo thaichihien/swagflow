@@ -16,7 +16,9 @@ public interface ProductService extends ProductServicePagination {
     List<ProductResponse> getAllProducts();
     List<ProductFullResponse> getAllFullProducts();
 
-    ProductResponse findById(String id,boolean isAdmin);
+    ProductResponse findById(String id);
+
+    List<ProductResponse> findByIds(List<String> ids);
 
     ProductResponse update(UpdateProductDto updateProductDto);
 

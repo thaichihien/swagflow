@@ -46,6 +46,7 @@ export class CustomerService {
       lastName: customer.lastName,
       dob: customer.dob,
       phone: customer.phone,
+     
     };
 
     return profile;

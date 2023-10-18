@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
   Post,
   Req,
   Res,
@@ -58,4 +59,10 @@ export class AuthController {
     const refreshToken = req.user['refreshToken'];
     return await this.authService.refreshToken(id, refreshToken);
   }
+
+  @Get('decode/:token')
+  async decodeToken(@Param('token') token: string) {
+    return await this.authService.decodeToken(token)
+  }
+
 }

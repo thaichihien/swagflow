@@ -1,4 +1,5 @@
 export class CustomerProfileDto {
+ 
   email: string;
   firstName: string;
   lastName: string;

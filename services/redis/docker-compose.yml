@@ -1,0 +1,17 @@
+version: '3.0'
+
+services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis-container
+    restart: unless-stopped
+    environment:
+      REDIS_ARGS: "--requirepass 123456"
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - redis-data:/data
+volumes:
+  redis-data:
+    driver: local

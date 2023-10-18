@@ -2,15 +2,13 @@ package com.swagflow.productservice.product.model;
 
 import com.swagflow.productservice.size.Size;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "product_size")
 @IdClass(ProductSizeIds.class)
-@Data
+@Setter
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

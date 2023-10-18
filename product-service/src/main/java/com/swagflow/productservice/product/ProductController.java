@@ -99,10 +99,10 @@ public class ProductController {
 
         if(view != null && view.equals("admin")){
             // - TODO validate admin token
-            return productService.findById(id,true);
+            return productService.findById(id);
         }
 
-        return productService.findById(id,false);
+        return productService.findById(id);
     }
 
 

@@ -169,37 +169,55 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse findById(String id, boolean isAdmin) {
+    @Transactional(readOnly = true)
+    public ProductResponse findById(String id) {
         UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
 
         Product one = productRepository.getProduct().findById(uuid).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found with id")
         );
+
+
         List<ProductSizeResponse> sizeResponses = convertProductQuantity(one.getProductSizes(), true);
 
         List<String> imgUrls = one.getImages().stream().map(ProductImage::getUrl).toList();
-        if (isAdmin) {
-            return ProductResponse.builder()
-                    .id(one.getId())
-                    .name(one.getName())
-                    .description(one.getDescription())
-                    .price(one.getPrice())
-                    .category(one.getCategory().getId().toString())
-                    .brand(one.getBrand().getId().toString())
-                    .sizes(sizeResponses)
+        return ProductResponse.builder()
+                .id(one.getId())
+                .name(one.getName())
+                .description(one.getDescription())
+                .price(one.getPrice())
+                .category(one.getCategory().getId().toString())
+                .brand(one.getBrand().getId().toString())
+                .sizes(sizeResponses)
+                .images(imgUrls)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> findByIds(List<String> ids) {
+        List<UUID> uuids = new LinkedList<>();
+        for(String id : ids){
+            UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
+            uuids.add(uuid);
+        }
+
+        List<Product> products= productRepository.getProduct().findAllById(uuids);
+        List<ProductResponse> responses = new LinkedList<>();
+        for(Product product : products){
+            List<String> imgUrls = product.getImages().stream().map(ProductImage::getUrl).toList();
+            ProductResponse res = ProductResponse.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .price(product.getPrice())
+                    .category(product.getCategory().getId().toString())
+                    .brand(product.getBrand().getId().toString())
                     .images(imgUrls)
                     .build();
-        } else {
-            return ProductResponse.builder()
-                    .id(one.getId())
-                    .name(one.getName())
-                    .description(one.getDescription())
-                    .price(one.getPrice())
-                    .category(one.getCategory().getName())
-                    .brand(one.getId().toString())
-                    .sizes(sizeResponses)
-                    .build();
+            responses.add(res);
         }
+        return  responses;
     }
 
     @Override

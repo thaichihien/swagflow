@@ -5,9 +5,11 @@ import * as Redis from 'redis';
 export const REDIS_SERVICE = 'REDIS';
 
 @Module({
+  
   providers: [
     {
-      inject: [ConfigModule],
+      
+      inject: [ConfigService],
       provide: REDIS_SERVICE,
       useFactory: async (configService: ConfigService) => {
         const username = configService.get('REDIS_USERNAME');
@@ -15,10 +17,9 @@ export const REDIS_SERVICE = 'REDIS';
         const redisUrl = configService.get('REDIS_URL');
 
         const client = Redis.createClient({
-          url: `rediss://${username}:${password}@${redisUrl}`,
+          url: `redis://:${password}@${redisUrl}`,
         });
         await client.connect();
-        
         return client;
       },
     },

@@ -8,7 +8,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import {RedisClientType } from 'redis'
 import  RedisStore from 'connect-redis'
 import { REDIS_SERVICE, RedisModule } from './redis/redis.module';
-import session from 'express-session';
+import { MessagingModule } from './messaging/messaging.module';
+import * as session from 'express-session';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,9 +19,11 @@ import session from 'express-session';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DB_URI),
+    JwtModule.register({}),
     CartModule,
     DatabaseModule,
     RedisModule,
+    MessagingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -39,6 +43,7 @@ export class AppModule implements NestModule {
         saveUninitialized : false,
         secret : this.configService.get("SESSION_SECRET"),
         resave : false,
+        rolling : true,
         cookie : {
           sameSite : true,
           httpOnly : true,

@@ -6,7 +6,8 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
