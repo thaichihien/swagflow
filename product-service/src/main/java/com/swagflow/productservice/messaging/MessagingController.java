@@ -89,7 +89,7 @@ public class MessagingController {
 
             return RabbitMQResponse.<List<ProductResponse>>builder()
                     .success(true)
-                    .message("all product detail")
+                    .message("Get all product details successfully")
                     .data(productResponse)
                     .build();
         }catch (ResponseStatusException rse){

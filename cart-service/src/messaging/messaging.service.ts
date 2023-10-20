@@ -6,6 +6,10 @@ import { RabbitMQResponse } from './dto/rabbitmq-response.dto';
 @Injectable()
 export class MessagingService {
   protected EXCHANGE_NAME: string;
+  readonly PRODUCT_DETAIL_QUEUE = 'product-detail-queue';
+  readonly PRODUCTS_DETAIL_QUEUE = 'products-detail-queue';
+  readonly ACCOUNT_QUEUE = 'account-queue'
+
 
   private readonly logger = new Logger(MessagingService.name);
 

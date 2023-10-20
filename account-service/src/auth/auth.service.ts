@@ -11,6 +11,7 @@ import { SignUpDto } from './dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtPayLoad } from './interfaces/jwt.payload';
+import { Customer } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -154,16 +155,21 @@ export class AuthService {
     await this.customerService.saveRefreshToken(id, hashedRefreshToken);
   }
 
-  async verifyUser(token: string) {
-    // - verify access token
-    const payload: JwtPayLoad = await this.jwtService.verifyAsync(token, {
-      secret: this.configService.get<string>('ACCESS_SECRET'),
-    });
+  async verifyUser(token: string): Promise<Customer | null> {
+    try {
+      // - verify access token
+      const payload: JwtPayLoad = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get<string>('ACCESS_SECRET'),
+      });
 
-    // - get account from id
-    const user = await this.customerService.findOneByID(payload.sub);
+      // - get account from id
+      const user = await this.customerService.findOneByID(payload.sub);
 
-    return user;
+      return user;
+    } catch (error) {
+      this.logger.error(error);
+      return null;
+    }
   }
 
   async decodeToken(token: string) {

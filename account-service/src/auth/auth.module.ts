@@ -10,5 +10,6 @@ import { CookieTokenStrategy } from './strategies/cookie-token.strategy';
   imports: [JwtModule.register({}), CustomerModule],
   controllers: [AuthController],
   providers: [AuthService, CookieTokenStrategy, AccessTokenStrategy],
+  exports : [AuthService]
 })
 export class AuthModule {}

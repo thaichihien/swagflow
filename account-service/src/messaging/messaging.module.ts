@@ -3,6 +3,7 @@ import { MessagingService } from './messaging.service';
 import { MessagingController } from './messaging.controller';
 import { RabbitMQConfig, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports : [
@@ -25,15 +26,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
               }
             ],
             uri: `amqp://${user}:${password}@${host}`, 
+            enableControllerDiscovery : true
             //connectionInitOptions: { wait: false },
           }
 
           return config
       }
-    })
+    }),
+    AuthModule
   ],
   controllers: [MessagingController],
-  providers: [MessagingService],
-  exports: [MessagingService]
+  providers: [MessagingService,MessagingController]
 })
 export class MessagingModule {}

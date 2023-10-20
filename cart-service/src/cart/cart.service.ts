@@ -1,22 +1,22 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpStatus,
   Inject,
   Injectable,
+  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { IDataServices } from 'src/database/database.interface';
 import { CartItem } from './schemas/cart-item.schema';
 import { REDIS_SERVICE } from 'src/redis/redis.module';
 import { RedisClientType } from 'redis';
 import { CartResDto } from './dto/cart-res.dto';
 import { CartItemResDto } from './dto/cart-item-res.dto';
-import { MessagingProductService } from 'src/messaging/messaging-product.service';
 import { Cart } from './schemas/cart.schema';
 import { CustomerProfileFullDto } from './dto/customer-profile-full.dto';
+import { MessagingService } from 'src/messaging/messaging.service';
+import { ProductDetailDto } from './dto/product-detail.dto';
 
 @Injectable()
 export class CartService {
@@ -25,7 +25,7 @@ export class CartService {
     private readonly dataServices: IDataServices,
     @Inject(REDIS_SERVICE)
     private readonly redisService: RedisClientType,
-    private readonly messagingService: MessagingProductService,
+    private readonly messagingService: MessagingService,
   ) {}
 
   //-----------Redis Session------------------
@@ -42,12 +42,14 @@ export class CartService {
     }
 
     // -- get product detail list from product service
-    const response = await this.messagingService.getAllProductDetail(
-      Object.keys(cart),
-    );
+    const response = await this.messagingService.send<
+      ProductDetailDto[],
+      string[]
+    >(Object.keys(cart), this.messagingService.PRODUCTS_DETAIL_QUEUE);
 
     if (!response.success) {
       this.logger.error(response.message);
+      throw new InternalServerErrorException('communication error')
     }
 
     for (const product of response.data) {
@@ -251,11 +253,16 @@ export class CartService {
   }
 
   async getCustomerInfo(token: string): Promise<CustomerProfileFullDto> {
-    const customer: CustomerProfileFullDto = {
-      id: '',
-    };
+    const response = await this.messagingService.send<
+      CustomerProfileFullDto,
+      string
+    >(token, this.messagingService.ACCOUNT_QUEUE);
+    if (!response.success) {
+      this.logger.error(response.message);
+      return null;
+    }
 
-    return customer;
+    return response.data;
   }
 
   async findCartForCustomer(
@@ -273,25 +280,29 @@ export class CartService {
     // - findByCustomerId(id)
     const cart = await this.findByCustomerId(customer.id);
     // - merge items from cart in redux (anonymouse) to cart in mongodb (authenticated) (if existed)
-    await this.mergeGuestCart(cartIdSession, cart.id);
+    const mergedCart = await this.mergeGuestCart(cartIdSession, cart.id);
+
+    if(mergedCart){
+      return await this.mapToCartResDto(mergedCart)
+    }
     // - return cart
     return await this.mapToCartResDto(cart);
   }
 
   async mergeGuestCart(fromCartId: string, toCartId: string) {
     if (!fromCartId || !toCartId) {
-      return;
+      return null;
     }
 
     const cartSession = await this.redisService.hGetAll(
       this.getCartKey(fromCartId),
     );
     if (!cartSession) {
-      return;
+      return null;
     }
     const cartDB = await this.dataServices.cart.findById(toCartId);
     if (!cartDB) {
-      return;
+      return null;
     }
 
     for (const productId of Object.keys(cartSession)) {
@@ -313,6 +324,8 @@ export class CartService {
         this.getProductKey(productId),
       );
     }
+
+    return cartDB
   }
 
   async mapToCartResDto(cart: Cart) {
@@ -323,9 +336,20 @@ export class CartService {
     const cartMap = new Map<string, number>(
       cart.items.map((item) => [item.productId, item.quantity]),
     );
-    const response = await this.messagingService.getAllProductDetail(
+    const response = await this.messagingService.send<
+      ProductDetailDto[],
+      string[]
+    >(
       cart.items.map((cartItem) => cartItem.productId),
+      this.messagingService.PRODUCTS_DETAIL_QUEUE,
     );
+
+    if (!response.success) {
+      this.logger.error(response.message);
+      throw new InternalServerErrorException('communication error')
+    }
+
+    
 
     for (const product of response.data) {
       const item: CartItemResDto = {
