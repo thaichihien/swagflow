@@ -52,4 +52,4 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 
 ## Architecture
 
-![architecture-model](https://github.com/thaichihien/telephone-booking-operator/blob/main/doc/swagflow_architecture.png)
+![architecture-model](https://github.com/thaichihien/swagflow/blob/main/doc/swagflow_architecture.png)
