@@ -22,7 +22,7 @@ export class CartController {
   ): Promise<CartResDto> {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.findCart(cartId);
+      return await this.cartService.findCartSession(cartId);
     } else {
       const token = sess['user'];
       return await this.cartService.findCartForCustomer(token, cartId);
@@ -37,7 +37,7 @@ export class CartController {
   ): Promise<CartResDto> {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.addItemToCartRedis(productId, cartId);
+      return await this.cartService.addItemToCartSession(productId, cartId);
     } else {
       const token = sess['user'];
       return await this.cartService.addItemToCart(productId, token);
@@ -52,7 +52,7 @@ export class CartController {
   ): Promise<CartResDto> {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.removeItemFromCartRedis(productId, cartId);
+      return await this.cartService.removeItemFromCartSession(productId, cartId);
     } else {
       const token = sess['user'];
       return await this.cartService.removeItemFromCart(productId, token);
@@ -63,7 +63,7 @@ export class CartController {
   async clearCart(@Session() sess: session.Session) {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.clearCartRedis(cartId);
+      return await this.cartService.clearCartSession(cartId);
     } else {
       const token = sess['user'];
       return await this.cartService.clearCart(token);

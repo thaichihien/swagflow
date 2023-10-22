@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { CustomerService } from 'src/customer/customer.service';
+import { CustomerService } from '../customer/customer.service';
 import { SignUpDto } from './dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
@@ -64,7 +64,7 @@ export class AuthService {
     }
 
     // - verify password
-    if (!this.verifyPassword(signInDto.password, existedCustomer.password)) {
+    if (!(await this.verifyPassword(signInDto.password, existedCustomer.password))) {
       throw new BadRequestException('The password is wrong');
     }
 
@@ -93,7 +93,7 @@ export class AuthService {
     }
 
     // - verify refresh token
-    if (!this.verifyPassword(refreshToken, existedCustomer.refreshToken)) {
+    if (!(await this.verifyPassword(refreshToken, existedCustomer.refreshToken))) {
       throw new ForbiddenException('Access denied');
     }
 

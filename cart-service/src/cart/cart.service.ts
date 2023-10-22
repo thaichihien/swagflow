@@ -17,6 +17,7 @@ import { Cart } from './schemas/cart.schema';
 import { CustomerProfileFullDto } from './dto/customer-profile-full.dto';
 import { MessagingService } from 'src/messaging/messaging.service';
 import { ProductDetailDto } from './dto/product-detail.dto';
+import { CartEntity } from './interfaces/cart-doc.interface';
 
 @Injectable()
 export class CartService {
@@ -30,7 +31,7 @@ export class CartService {
 
   //-----------Redis Session------------------
 
-  async findCart(cartId: string) {
+  async findCartSession(cartId: string) {
     const cartResponse: CartResDto = {
       totalPrice: 0,
       items: [],
@@ -49,7 +50,7 @@ export class CartService {
 
     if (!response.success) {
       this.logger.error(response.message);
-      throw new InternalServerErrorException('communication error')
+      throw new InternalServerErrorException('communication error');
     }
 
     for (const product of response.data) {
@@ -65,7 +66,7 @@ export class CartService {
     return cartResponse;
   }
 
-  async addItemToCartRedis(productId: string, cartId: string) {
+  async addItemToCartSession(productId: string, cartId: string) {
     // TODO reduce stock
 
     const quantityInCart =
@@ -81,10 +82,10 @@ export class CartService {
       1,
     );
 
-    return this.findCart(cartId);
+    return this.findCartSession(cartId);
   }
 
-  async removeItemFromCartRedis(productId: string, cartId: string) {
+  async removeItemFromCartSession(productId: string, cartId: string) {
     // TODO increase stock
 
     await this.redisService.hDel(
@@ -92,10 +93,10 @@ export class CartService {
       this.getProductKey(productId),
     );
 
-    return this.findCart(cartId);
+    return this.findCartSession(cartId);
   }
 
-  async clearCartRedis(cartId: string) {
+  async clearCartSession(cartId: string) {
     const cart = await this.redisService.hGetAll(this.getCartKey(cartId));
 
     if (!cart) {
@@ -176,10 +177,10 @@ export class CartService {
       cart.items.push(newCartItem);
     }
 
-    await cart.save();
+    await this.dataServices.cart.update(cart.id, cart);
     // - return cart
 
-    return this.mapToCartResDto(cart);
+    return await this.mapToCartResDto(cart);
   }
 
   async changeItemQuantityInCart(
@@ -205,12 +206,7 @@ export class CartService {
       cart.items.push(newCartItem);
     }
 
-    await cart.save();
-    // - return cart
-
-    // - populate cart item from product service
-
-    // - check item available
+    await this.dataServices.cart.update(cart.id, cart);
 
     return cart;
   }
@@ -237,10 +233,10 @@ export class CartService {
     cart.items.splice(index, 1);
 
     // - save cart
-    await cart.save();
+    await this.dataServices.cart.update(cart.id, cart);
 
     // - return cart
-    return this.mapToCartResDto(cart);
+    return await this.mapToCartResDto(cart);
   }
 
   async clearCart(token: string) {
@@ -249,7 +245,7 @@ export class CartService {
     const cart = await this.findByCustomerId(customer.id);
 
     cart.items = [];
-    await cart.save();
+    await this.dataServices.cart.update(cart.id, cart);
   }
 
   async getCustomerInfo(token: string): Promise<CustomerProfileFullDto> {
@@ -280,17 +276,17 @@ export class CartService {
     // - findByCustomerId(id)
     const cart = await this.findByCustomerId(customer.id);
     // - merge items from cart in redux (anonymouse) to cart in mongodb (authenticated) (if existed)
-    const mergedCart = await this.mergeGuestCart(cartIdSession, cart.id);
+    const mergedCart = await this.mergeGuestCart(cartIdSession, cart);
 
-    if(mergedCart){
-      return await this.mapToCartResDto(mergedCart)
+    if (mergedCart) {
+      return await this.mapToCartResDto(mergedCart);
     }
     // - return cart
     return await this.mapToCartResDto(cart);
   }
 
-  async mergeGuestCart(fromCartId: string, toCartId: string) {
-    if (!fromCartId || !toCartId) {
+  async mergeGuestCart(fromCartId: string, cartDB: CartEntity) {
+    if (!fromCartId || !cartDB) {
       return null;
     }
 
@@ -298,10 +294,6 @@ export class CartService {
       this.getCartKey(fromCartId),
     );
     if (!cartSession) {
-      return null;
-    }
-    const cartDB = await this.dataServices.cart.findById(toCartId);
-    if (!cartDB) {
       return null;
     }
 
@@ -318,17 +310,17 @@ export class CartService {
         cartDB.items.push(newCartItem);
       }
 
-      await cartDB.save();
+      await this.dataServices.cart.update(cartDB.id, cartDB);
       await this.redisService.hDel(
         this.getCartKey(fromCartId),
         this.getProductKey(productId),
       );
     }
 
-    return cartDB
+    return cartDB;
   }
 
-  async mapToCartResDto(cart: Cart) {
+  async mapToCartResDto(cart: CartEntity) {
     const cartResponse: CartResDto = {
       totalPrice: 0,
       items: [],
@@ -346,10 +338,8 @@ export class CartService {
 
     if (!response.success) {
       this.logger.error(response.message);
-      throw new InternalServerErrorException('communication error')
+      throw new InternalServerErrorException('communication error');
     }
-
-    
 
     for (const product of response.data) {
       const item: CartItemResDto = {

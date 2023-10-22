@@ -8,8 +8,7 @@ export class MessagingService {
   protected EXCHANGE_NAME: string;
   readonly PRODUCT_DETAIL_QUEUE = 'product-detail-queue';
   readonly PRODUCTS_DETAIL_QUEUE = 'products-detail-queue';
-  readonly ACCOUNT_QUEUE = 'account-queue'
-
+  readonly ACCOUNT_QUEUE = 'account-queue';
 
   private readonly logger = new Logger(MessagingService.name);
 
@@ -24,17 +23,26 @@ export class MessagingService {
     message: K,
     routingKey: string,
   ): Promise<RabbitMQResponse<T>> {
-    const response = await this.rabbitClient.request<RabbitMQResponse<T>>({
-      exchange: this.EXCHANGE_NAME,
-      routingKey: routingKey,
-      payload: {
-        message: message,
-      },
-    });
+    try {
+      const response = await this.rabbitClient.request<RabbitMQResponse<T>>({
+        exchange: this.EXCHANGE_NAME,
+        routingKey: routingKey,
+        payload: {
+          message: message,
+        },
+      });
 
-    this.logger.log(`receive success: ${response.success}`);
-    this.logger.log(response.message);
-
-    return response;
+      this.logger.log(`receive success: ${response.success}`);
+      this.logger.log(response.message);
+      return response;
+    } catch (error) {
+      this.logger.error(error);
+      const errorResponse: RabbitMQResponse<T> = {
+        success: false,
+        message: error,
+        data: undefined,
+      };
+      return errorResponse;
+    }
   }
 }

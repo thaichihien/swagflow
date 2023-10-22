@@ -2,7 +2,7 @@
 
 ## Introduction
 
-An e-commerce project about a fictional clothing trading system called SwagFlow. This project focuses mainly on backend development and system design. This project not only  not only showcases a range of self-taught skills and knowledge, but also serves as an experimental playground for exploring and testing new techniques.
+An e-commerce project about a fictional clothing sales system called SwagFlow. This project focuses mainly on backend development and system design. This project not only  not only showcases a range of self-taught skills and knowledge, but also serves as an experimental playground for exploring and testing new techniques.
 
 ## Tech Stack
 
@@ -45,6 +45,11 @@ An e-commerce project about a fictional clothing trading system called SwagFlow.
 - [X] Set up RPC communication using **RabbitMQ**
 - [X] Implement shopping cart features for authenticated customers by communicating with **account-service** and retrieving product information from **product-service**
 - [ ] Implement shopping cart functionality in the front end application
+- [ ] Write Unit test for some primary features
 - [ ] Set up **Kong API Gateway**
 
 ## Run a project locally
+
+## Architecture
+
+![architecture-model](https://github.com/thaichihien/telephone-booking-operator/blob/main/doc/swagflow_architecture.png)
