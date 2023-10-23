@@ -6,6 +6,7 @@ import Products from "./pages/Products"
 import Contact from "./pages/Contact"
 import Playground from "./pages/Playground"
 import Authentication from "./pages/Authentication"
+import Cart from "./pages/Cart"
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:category" element={<Products />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/playground" element={<Playground />} />
           </Route>
 

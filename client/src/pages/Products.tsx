@@ -183,6 +183,7 @@ function Products() {
                   key={product.id}
                 >
                   <ProductCard
+                    id={product.id}
                     src={cover}
                     title={product.name}
                     brand={product.brand}

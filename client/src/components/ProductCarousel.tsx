@@ -79,12 +79,14 @@ const ProductCarousel = forwardRef(
 
                   return (
                     <div
+                      key={product.id}
                       className={
                         index == 0 ? "carousel-item active" : "carousel-item"
                       }
                     >
                       <div className="col-md-3">
                         <ProductCard
+                          id={product.id}
                           src={cover}
                           title={product.name}
                           brand={product.brand}

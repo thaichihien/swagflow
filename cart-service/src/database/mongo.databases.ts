@@ -4,8 +4,8 @@ import { IRepository } from './repository.inteface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MongoCartRepository } from 'src/cart/repositories/cart.repository.mongo';
-import { CartEntity } from 'src/cart/interfaces/cart-doc.interface';
 import { Cart } from 'src/cart/schemas/cart.schema';
+import { CartEntity } from 'src/cart/enities/cart.enity';
 
 @Injectable()
 export class MongoDatabases implements IDataServices, OnApplicationBootstrap {

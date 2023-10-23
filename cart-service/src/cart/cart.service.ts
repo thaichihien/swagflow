@@ -17,7 +17,8 @@ import { Cart } from './schemas/cart.schema';
 import { CustomerProfileFullDto } from './dto/customer-profile-full.dto';
 import { MessagingService } from 'src/messaging/messaging.service';
 import { ProductDetailDto } from './dto/product-detail.dto';
-import { CartEntity } from './interfaces/cart-doc.interface';
+import { CartEntity } from './enities/cart.enity';
+
 
 @Injectable()
 export class CartService {
@@ -53,15 +54,18 @@ export class CartService {
       throw new InternalServerErrorException('communication error');
     }
 
+    let totalPrice = 0;
     for (const product of response.data) {
       const item: CartItemResDto = {
         product: product,
         quantity: +cart[product.id],
       };
 
+      totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
     // TODO calculate price
+    cartResponse.totalPrice = totalPrice;
 
     return cartResponse;
   }
@@ -341,14 +345,17 @@ export class CartService {
       throw new InternalServerErrorException('communication error');
     }
 
+    let totalPrice = 0;
     for (const product of response.data) {
       const item: CartItemResDto = {
         product: product,
         quantity: cartMap.get(product.id),
       };
 
+      totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
+    cartResponse.totalPrice = totalPrice;
 
     return cartResponse;
   }

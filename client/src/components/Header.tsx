@@ -180,10 +180,10 @@ function Header() {
                   </div>
                 </li>
                 <li>
-                  <div className="header-icon">
+                  <Link className="header-icon" to="/cart">
                     <BsCart2 className="fs-4" />
                     <span className="badge badge-warning lblCartCount">15</span>
-                  </div>
+                  </Link>
                 </li>
               </ul>
             </div>

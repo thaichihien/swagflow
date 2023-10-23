@@ -11,3 +11,8 @@ export const privateAxios = new Axios({
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
 })
+export const cartAxios = new Axios({
+    baseURL : import.meta.env.VITE_CART_HOST,
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: true
+})

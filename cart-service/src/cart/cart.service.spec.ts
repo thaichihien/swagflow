@@ -1,38 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartService } from './cart.service';
 import { IDataServices } from 'src/database/database.interface';
-import { Cart } from './schemas/cart.schema';
 import { RedisClientType } from 'redis';
 import { MessagingService } from 'src/messaging/messaging.service';
 import { CartResDto } from './dto/cart-res.dto';
 import { RabbitMQResponse } from 'src/messaging/dto/rabbitmq-response.dto';
 import { ProductDetailDto } from './dto/product-detail.dto';
-import { CartItemResDto } from './dto/cart-item-res.dto';
 import {
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CustomerProfileFullDto } from './dto/customer-profile-full.dto';
-import {
-  Document,
-  Model,
-  DocumentSetOptions,
-  QueryOptions,
-  UpdateQuery,
-  AnyObject,
-  PopulateOptions,
-  MergeType,
-  Query,
-  SaveOptions,
-  ToObjectOptions,
-  FlattenMaps,
-  Require_id,
-  UpdateWithAggregationPipeline,
-  pathsToSkip,
-  Error,
-} from 'mongoose';
-import { CartEntity } from './interfaces/cart-doc.interface';
+
 import { REDIS_SERVICE } from 'src/redis/redis.module';
+import { CartEntity } from './enities/cart.enity';
 
 describe('CartService', () => {
   let service: CartService;
@@ -192,7 +173,7 @@ describe('CartService', () => {
 
       expect(cart.items.length).toEqual(2);
       expect(cart.items).toEqual(cartResponse.items);
-      expect(cart.totalPrice).toEqual(0);
+      expect(cart.totalPrice).toBeGreaterThan(0)
     });
 
     it('should throw an InternalServerErrorException if there is an error from product-service', async () => {

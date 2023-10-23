@@ -1,8 +1,7 @@
 import { IRepository } from "src/database/repository.inteface";
 import { Cart } from "../schemas/cart.schema";
 import { Model } from "mongoose";
-import { on } from "events";
-import { CartEntity } from "../interfaces/cart-doc.interface";
+import { CartEntity } from "../enities/cart.enity";
 
 
 export class MongoCartRepository implements IRepository<CartEntity>{

@@ -2,8 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-const PORT = process.env.PORT
-
+const PORT = process.env.PORT;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,8 +15,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
- 
 
+  app.enableCors({
+    allowedHeaders: ['content-type'],
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
   await app.listen(PORT);
   console.log(`listening at http://localhost:${PORT}`);
 }

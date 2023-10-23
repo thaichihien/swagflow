@@ -2,7 +2,7 @@
 
 ## Introduction
 
-An e-commerce project about a fictional clothing sales system called SwagFlow. This project focuses mainly on backend development and system design. This project not only  not only showcases a range of self-taught skills and knowledge, but also serves as an experimental playground for exploring and testing new techniques.
+An e-commerce project about a fictional clothing sales system called SwagFlow. This project focuses mainly on backend development and system design. This project not only showcases a range of self-taught skills and knowledge, but also serves as an experimental playground for exploring and testing new techniques.
 
 ## Tech Stack
 
