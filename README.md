@@ -31,7 +31,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - Database (JPA, Prisma, PostgreSQL, MongoDB)
 - Session and cached (Redis)
 - API Gateway (Kong API)
-- Monitoring và Logging (Prometheus, Grafana, ELK stack (Elasticsearch, Logstash, Kibana).
+- Monitoring và Logging (Prometheus, Grafana, ELK stack (Elasticsearch, Logstash, Kibana)).
 - Unit Testing (Jest, JUnit)
 
 ## Main Features
