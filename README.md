@@ -21,6 +21,19 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - RabbitMQ
 - Kong API
   
+## Techniques
+- Front-end State Management (React, Redux)
+- RESTful API (NestJS, Spring Boot)
+- Authentication (JWT)
+- Microservices
+- Message Broker (RabbitMQ)
+- Containerization (Docker)
+- Database (JPA, Prisma, PostgreSQL, MongoDB)
+- Session and cached (Redis)
+- API Gateway (Kong API)
+- Monitoring và Logging (Prometheus, Grafana, ELK stack (Elasticsearch, Logstash, Kibana).
+- Unit Testing (Jest, JUnit)
+
 ## Main Features
 
 - Display products
@@ -45,7 +58,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [X] Set up RPC communication using **RabbitMQ**
 - [X] Implement shopping cart features for authenticated customers by communicating with **account-service** and retrieving product information from **product-service**
 - [ ] Implement shopping cart functionality in the front end application
-- [ ] Write Unit test for some primary features
+- [X] Write Unit test for some primary features
 - [ ] Set up **Kong API Gateway**
 
 ## Run a project locally
