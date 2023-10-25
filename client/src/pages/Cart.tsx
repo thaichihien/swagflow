@@ -2,16 +2,18 @@ import React, { useEffect } from "react"
 import CartItem from "../components/CartItem"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import { getCart, selectCart } from "../features/cart/cartSlice"
+import { selectCurrentToken } from "../features/auth/authenticationSlice"
 
 type Props = {}
 
 function Cart({}: Props) {
   const cartResponse = useAppSelector(selectCart)
   const dispatch = useAppDispatch()
+  const token = useAppSelector(selectCurrentToken)
 
   useEffect(() => {
     // TODO call api /carts
-    dispatch(getCart())
+    dispatch(getCart(token))
   }, [])
 
   return (

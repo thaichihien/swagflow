@@ -174,7 +174,7 @@ public class ProductServiceImpl implements ProductService {
         UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
 
         Product one = productRepository.getProduct().findById(uuid).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found with id")
+                () -> new NoSuchElementException("Product not found with id")
         );
 
 
@@ -186,8 +186,8 @@ public class ProductServiceImpl implements ProductService {
                 .name(one.getName())
                 .description(one.getDescription())
                 .price(one.getPrice())
-                .category(one.getCategory().getId().toString())
-                .brand(one.getBrand().getId().toString())
+                .category(one.getCategory().getName())
+                .brand(one.getBrand().getName())
                 .sizes(sizeResponses)
                 .images(imgUrls)
                 .build();
@@ -211,8 +211,8 @@ public class ProductServiceImpl implements ProductService {
                     .name(product.getName())
                     .description(product.getDescription())
                     .price(product.getPrice())
-                    .category(product.getCategory().getId().toString())
-                    .brand(product.getBrand().getId().toString())
+                    .category(product.getCategory().getName())
+                    .brand(product.getBrand().getName())
                     .images(imgUrls)
                     .build();
             responses.add(res);

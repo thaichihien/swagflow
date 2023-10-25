@@ -17,7 +17,7 @@ import java.util.List;
 @Tag(name = "Product")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/product")
+@RequestMapping("/api/v1/products")
 @Slf4j
 public class ProductController {
     private final ProductService productService;
@@ -45,17 +45,11 @@ public class ProductController {
     @Operation(summary = "Get all products (for admin)")
     @GetMapping("/admin")
     @ResponseStatus(HttpStatus.OK)
-    public List<? extends ProductResponse> getAllProducts(@RequestParam String view){
-
-        if(view != null && view.equals("admin")){
-            // - TODO validate admin token
-            return productService.getAllFullProducts();
-        }
-
-        return productService.getAllProducts();
+    public List<ProductFullResponse> getAllProducts(){
+        return productService.getAllFullProducts();
     }
 
-    @Operation(summary = "Get all products")
+    @Operation(summary = "Get all products by offset")
     @GetMapping("/offset")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponseOffsetPagination getAllProductsForCustomer(
@@ -85,27 +79,15 @@ public class ProductController {
         if(category.equals("all")){
             return  productService.getProducts(next,limit);
         }
-
-
-
-
         return productService.getProducts(next,limit,category,brands);
     }
 
     @Operation(summary = "get product by id")
     @GetMapping("/detail/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductResponse getProductWithId(@PathVariable String id,@RequestParam String view){
-
-        if(view != null && view.equals("admin")){
-            // - TODO validate admin token
-            return productService.findById(id);
-        }
-
+    public ProductResponse getProductWithId(@PathVariable String id){
         return productService.findById(id);
     }
-
-
 
 
     @Operation(summary = "Update a product")

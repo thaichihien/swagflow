@@ -120,7 +120,7 @@ export class AuthService {
     const payload: JwtPayLoad = {
       sub: id,
       username: username,
-      iss: 'KONG ISS',
+      iss: this.configService.get<string>('ISS_KEY'),
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('ACCESS_SECRET'),

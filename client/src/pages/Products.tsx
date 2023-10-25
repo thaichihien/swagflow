@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react"
 import ProductCard from "../components/ProductCard"
 import { Product } from "../interfaces/product"
-import { ServerConfig } from "../config/env"
 import RadioFilter from "../components/RadioFilter"
 import { SimplePair } from "../interfaces/simplepair"
 import {
-  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
 } from "react-router-dom"
 import CheckboxFilter from "../components/CheckboxFilter"
 import axios from "../api/axios"
+import {  PRODUCT_SERVICE_PATH } from "../config/apiRoute"
 
 function Products() {
   const navigate = useNavigate()
@@ -33,7 +32,7 @@ function Products() {
   }
 
   function getApiUrlFilter(): string {
-    const apiPath = `/product/${category}?`
+    const apiPath = `${PRODUCT_SERVICE_PATH}/products/${category}?`
     let queryFilterParams: string[] = []
 
     queryFilterParams.push("limit=9")
@@ -97,7 +96,7 @@ function Products() {
   async function fetchFilters() {
     if (categories.length <= 0) {
       try {
-        const res = await axios.get("/category")
+        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/category`)
         if (res.status === 200) {
           const resJson = JSON.parse(res.data)
           setCategories(resJson)
@@ -111,7 +110,7 @@ function Products() {
 
     if (brands.length <= 0) {
       try {
-        const res = await axios.get("/brand")
+        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/brand`)
         if (res.status === 200) {
           const resJson = JSON.parse(res.data)
           setBrands(resJson)

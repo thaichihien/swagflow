@@ -1,8 +1,11 @@
 import React from "react"
 
 import { BsFillCartPlusFill, BsFillSuitHeartFill } from "react-icons/bs"
-import { cartAxios } from "../api/axios"
+import {  privateAxios } from "../api/axios"
 import { toast } from "react-toastify"
+import { CART_SERVICE_PATH } from "../config/apiRoute"
+import { useAppSelector } from "../app/hooks"
+import { selectCurrentToken } from "../features/auth/authenticationSlice"
 
 type Props = {
   id : string
@@ -13,12 +16,27 @@ type Props = {
 }
 
 const ProductCard = (props: Props) => {
+
+  const token = useAppSelector(selectCurrentToken)
+
   async function handleAddToCart(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): Promise<void> {
     // TODO call /carts/items/:productId
+
+    let config = {}
+
+    if(token){
+      config = {
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+        }
+      }
+    }
+
+
     try {
-      const response = await cartAxios.put(`/items/${props.id}`)
+      const response = await privateAxios.put(`${CART_SERVICE_PATH}/items/${props.id}`,null,config)
 
       if(response.status >= 200 && response.status < 300){
         toast.success(`Added product to cart`, {

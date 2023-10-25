@@ -1,4 +1,5 @@
 import { apiSlice } from "../../api/apiSlice"
+import { ACCOUNT_SERVICE_PATH, AUTH_SERVICE_PATH } from "../../config/apiRoute"
 import { CustomerProfile } from "../../interfaces/customer-profile"
 
 export interface LoginDto {
@@ -20,21 +21,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResDto, LoginDto>({
       query: (credentials) => ({
-        url: "/auth/sign-in",
+        url: `${AUTH_SERVICE_PATH}/sign-in`,
         method: "POST",
         body: credentials,
       }),
     }),
     register: builder.mutation<AuthResDto, RegisterDto>({
       query: (credentials) => ({
-        url: "/auth/sign-up",
+        url: `${AUTH_SERVICE_PATH}/sign-up`,
         method: "POST",
         body: credentials,
       }),
     }),
     profile: builder.mutation<CustomerProfile, void>({
       query: () => ({
-        url: "/customer/profile",
+        url: `${ACCOUNT_SERVICE_PATH}/profile`,
         method: "GET",
       }),
     }),

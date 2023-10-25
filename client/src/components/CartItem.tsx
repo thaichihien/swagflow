@@ -1,6 +1,8 @@
 import React from "react"
 import { BsX } from "react-icons/bs"
 import { Product } from "../interfaces/product"
+import { useAppDispatch } from "../app/hooks"
+import { removeItemFromCart } from "../features/cart/cartSlice"
 
 type Props = {
   product: Product
@@ -8,6 +10,13 @@ type Props = {
 }
 
 function CartItem({ product, quantity }: Props) {
+
+  const dispatch = useAppDispatch()
+
+  function handleRemoveItem(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void {
+    dispatch(removeItemFromCart(product.id))
+  }
+
   return (
     <div className="card mb-3">
       <div className="row g-0">
@@ -32,7 +41,7 @@ function CartItem({ product, quantity }: Props) {
             {/* <p className="card-text">
             <small className="text-muted">Last updated 3 mins ago</small>
           </p> */}
-            <div className="position-absolute top-0 end-0 remove-item-btn">
+            <div className="position-absolute top-0 end-0 remove-item-btn" onClick={handleRemoveItem}>
               <BsX />
             </div>
           </div>

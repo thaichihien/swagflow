@@ -28,7 +28,6 @@ public interface ProductService extends ProductServicePagination {
     void deleteAll();
     void deleteAll(boolean database);
 
-//    List<ProductSize> updateProductSizeOfProduct(List<SizeDto> sizeDtos,Product product);
 
     ProductResponse uploadProductImages(MultipartFile[] images,String id);
 

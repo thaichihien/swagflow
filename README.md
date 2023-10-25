@@ -22,6 +22,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - Kong API
   
 ## Techniques
+
 - Front-end State Management (React, Redux)
 - RESTful API (NestJS, Spring Boot)
 - Authentication (JWT)
@@ -44,6 +45,8 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
   
 ## Roadmap
 
+### V1
+
 - [X] Build home page for customer using **React**
 - [X] Build view products list page, add product page using template with **React**
 - [X] Set up RESTful API for CRUD product in **product-service**
@@ -57,11 +60,21 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [X] Implement shopping cart features for unauthenticated customers using session cookies and **Redis**
 - [X] Set up RPC communication using **RabbitMQ**
 - [X] Implement shopping cart features for authenticated customers by communicating with **account-service** and retrieving product information from **product-service**
-- [ ] Implement shopping cart functionality in the front end application
+- [X] Implement shopping cart functionality in the front end application
 - [X] Write Unit test for some primary features
-- [ ] Set up **Kong API Gateway**
+- [X] Set up **Kong API Gateway**
+- [ ] Logging request using **Kong API Gateway** and **ELK Stack**
+- [ ] Build detail product page
+- [ ] Complete the main functions and ready for release.
+  
+### V2
+
+- [ ] Using **Elasticsearch** for searching product
+- [ ] Caching using HTTP Header on **product-service**
 
 ## Run a project locally
+
+It will be available after the project is ready in version 1
 
 ## Architecture
 

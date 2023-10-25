@@ -277,10 +277,16 @@ export class CartService {
       throw new ForbiddenException('invalid token');
     }
 
+    //console.log(customer.id)
+
     // - findByCustomerId(id)
     const cart = await this.findByCustomerId(customer.id);
+
+    console.log(cart);
     // - merge items from cart in redux (anonymouse) to cart in mongodb (authenticated) (if existed)
     const mergedCart = await this.mergeGuestCart(cartIdSession, cart);
+
+    //console.log(mergedCart);
 
     if (mergedCart) {
       return await this.mapToCartResDto(mergedCart);

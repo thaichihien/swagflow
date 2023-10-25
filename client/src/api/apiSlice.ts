@@ -8,10 +8,11 @@ import { BaseQueryApi } from "@reduxjs/toolkit/dist/query/baseQueryTypes"
 import { logOut, setCredentials } from "../features/auth/authenticationSlice"
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_SERVER_HOST,
+  baseUrl: import.meta.env.VITE_SERVICE_HOST,
   prepareHeaders: (headers: Headers, { getState }) => {
     const token = (getState() as RootState).auth.token
     if (token) {
+      console.log("Set token");
       headers.set("Authorization", `Bearer ${token}`)
     }
 

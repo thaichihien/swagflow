@@ -25,7 +25,11 @@ export class HeaderJWTGuard implements CanActivate {
 
     const token = header.replace('Bearer', '').trim();
 
+    console.log(token);
+
     const validJWT = this.jwtService.decode(token);
+
+    console.log(validJWT);
 
     if (!validJWT) {
       return false;

@@ -40,13 +40,14 @@ export class CartController {
       return await this.cartService.addItemToCartSession(productId, cartId);
     } else {
       const token = sess['user'];
+      //console.log("addProductToCart:",token);
       return await this.cartService.addItemToCart(productId, token);
     }
   }
 
   @ApiOperation({ summary: 'Remove a item from cart' })
   @Delete('/items/:productId')
-  async removeProductToCart(
+  async removeProductFromCart(
     @Param('productId') productId: string,
     @Session() sess: session.Session,
   ): Promise<CartResDto> {

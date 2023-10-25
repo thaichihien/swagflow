@@ -3,8 +3,8 @@ import Banner from "../components/Banner"
 import ProductCarousel from "../components/ProductCarousel"
 import { useEffect, useState } from "react"
 import { Product } from "../interfaces/product"
-import { ServerConfig } from "../config/env"
 import axios from "../api/axios"
+import { PRODUCT_SERVICE_PATH } from "../config/apiRoute"
 
 function Home() {
   const [products, setProducts] = useState<Product[]>([])
@@ -15,7 +15,7 @@ function Home() {
 
   async function fetchNewProducts() {
     try {
-      const res = await axios.get("/product/all?limit=6")
+      const res = await axios.get(`${PRODUCT_SERVICE_PATH}/products/all?limit=6`)
 
       if(res.status == 200){
         const resJson = JSON.parse(res.data)

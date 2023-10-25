@@ -1,24 +1,36 @@
 _format_version: "1.1"
 
 services:
+- name: product-service
+  url : http://host.docker.internal:3002/api/v1
+  routes:
+  - name: product-route
+    paths:
+    - /product-service
+- name: cart-service
+  url : http://host.docker.internal:3003/carts
+  routes:
+  - name: cart-route
+    paths:
+    - /cart-service
 - name: auth-service
-  url: http://host.docker.internal:3000/auth
+  url : http://host.docker.internal:3001/api/v1/auth
   routes:
   - name: auth-route
     paths:
-    - /auth
-- name: my-server
-  url: http://host.docker.internal:3000/account
+    - /auth-service
+- name: account-service
+  url: http://host.docker.internal:3001/api/v1/customer
   routes:
   - name: account-route
     paths:
-    - /account
+    - /account-service
     plugins:
     - name: jwt
       enabled: true
       config:
         key_claim_name: iss
-
+        run_on_preflight: false
 
 
 consumers:
@@ -26,6 +38,6 @@ consumers:
 
 jwt_secrets:
 - consumer: my-username
-  key: test-key
-  secret: Hien
+  key: swagflow-key
+  secret: swagflow-access
 
