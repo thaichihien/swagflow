@@ -84,7 +84,7 @@ button {
   color: var(--dark-gold);
 }
 
-.account-menu{
+.account-menu {
   transform: translate(-45px, 35px) !important;
 }
 
@@ -118,11 +118,11 @@ padding-right: 9px; */
 }
 
 .category-block-wrapper {
-  
   position: relative;
+  cursor: pointer;
 }
 
-.category-block-wrapper h4{
+.category-block-wrapper h4 {
   color: white;
   position: absolute;
   top: 50%;
@@ -133,41 +133,34 @@ padding-right: 9px; */
   transition: all 0.5s;
 }
 
-.category-block-wrapper:hover h4{
+.category-block-wrapper:hover h4 {
   color: white;
   font-size: 2.5rem;
 }
 
-.category-block-wrapper:hover .category-block-bg{
+.category-block-wrapper:hover .category-block-bg {
   filter: brightness(0.2);
- 
 }
 
-
-.category-block-bg{
+.category-block-bg {
   height: 50vh;
   background-size: cover;
   filter: brightness(0.4);
   transition: all 0.5s;
 }
 
-
-#tshirts-block{
-  background-image: url('/images/tshirt_block.jpg');
+#tshirts-block {
+  background-image: url("/images/tshirt_block.jpg");
 }
-#jeans-block{
-  background-image: url('/images/jean_block.jpg');
+#jeans-block {
+  background-image: url("/images/jean_block.jpg");
 }
-#sweatpants-block{
-  background-image: url('/images/sweatpant_block.jpg');
+#sweatpants-block {
+  background-image: url("/images/sweatpant_block.jpg");
 }
-#jackets-block{
-  background-image: url('/images/jacket_block.jpg');
+#jackets-block {
+  background-image: url("/images/jacket_block.jpg");
 }
-
-
-
-
 
 /* ---------------Product Slider ----------*/
 
@@ -264,8 +257,6 @@ padding-right: 9px; */
   padding-top: 10px;
 }
 
-
-
 /* ----------------------------- */
 
 /* ---------------Home -------------- */
@@ -330,21 +321,25 @@ footer h4 {
   width: 17rem;
 }
 
-.product-card .card-title{
-  white-space: nowrap; 
-  width: 15rem; 
+.product-card .card-title {
+  white-space: nowrap;
+  width: 15rem;
   overflow: hidden;
   font-weight: bold;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
 }
 
 .product-image-wrapper {
   position: relative;
 }
 
+.product-image-wrapper img{
+  cursor: pointer;
+}
+
 .btn-on-product {
   position: absolute;
-  top : 0px;
+  top: 0px;
   opacity: 0;
   transition: all 0.3s;
 }
@@ -374,21 +369,19 @@ footer h4 {
 /* --------------------------- */
 /* ------------Authentication ------------------ */
 
-.authentication-background{
+.authentication-background {
   background-color: var(--dark-green);
   padding-bottom: 50px;
   padding-top: 30px;
 }
 
-.login-background{
+.login-background {
   height: 100vh;
 }
 
-.register-background{
+.register-background {
   padding-bottom: 10vh;
 }
-
-
 
 /* ---------------Authentication ---------- */
 .forms {
@@ -469,7 +462,7 @@ footer h4 {
   float: right;
 }
 
-.remove-item-btn{
+.remove-item-btn {
   font-size: 2.5rem;
   margin-top: 0.1rem;
   margin-right: 1.2rem;
@@ -477,3 +470,47 @@ footer h4 {
 }
 
 /* ----------------------------------- */
+/* ------------Product Detail------------ */
+
+.product-wrapper {
+  padding: 30px;
+  max-width: 1300px;
+  margin: auto;
+}
+
+.product-image {
+  width: 55%;
+  float: left;
+}
+
+.product-primary-image {
+  width: 100%;
+}
+
+.product-secondary-image {
+  width: 100%;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.product-detail {
+  margin-right: 1rem;
+  width: 40%;
+  float: right;
+}
+
+.btn-add-product-to-cart {
+  background-color: var(--dark-gold);
+  box-shadow: none;
+  color: white;
+  font-weight: bold;
+}
+.btn-add-product-to-cart:hover {
+  color: white;
+}
+.btn-add-product-to-cart:active {
+  background-color: var(--light-gold);
+  box-shadow: none;
+}
+
+/* ------------------------------- */

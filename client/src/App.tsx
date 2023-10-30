@@ -7,6 +7,7 @@ import Contact from "./pages/Contact"
 import Playground from "./pages/Playground"
 import Authentication from "./pages/Authentication"
 import Cart from "./pages/Cart"
+import ProductDetail from "./pages/ProductDetail"
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/:category" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/playground" element={<Playground />} />

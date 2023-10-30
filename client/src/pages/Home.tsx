@@ -1,13 +1,14 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Banner from "../components/Banner"
 import ProductCarousel from "../components/ProductCarousel"
-import { useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import { Product } from "../interfaces/product"
 import axios from "../api/axios"
 import { PRODUCT_SERVICE_PATH } from "../config/apiRoute"
 
 function Home() {
   const [products, setProducts] = useState<Product[]>([])
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchNewProducts()
@@ -26,6 +27,10 @@ function Home() {
     }
   }
 
+  function moveToCategory(category: string): void {
+    navigate(`/products/${category}`)
+  }
+
   return (
     <>
       <Banner />
@@ -41,13 +46,13 @@ function Home() {
       <section >
         <div className="row g-0">
           <div className="col">
-            <div className="category-block-wrapper">
+            <div className="category-block-wrapper" onClick={e => moveToCategory('T-Shirts')}>
               <div id="tshirts-block" className="category-block-bg"></div>
               <h4> T-Shirts</h4>
             </div>
           </div>
           <div className="col">
-            <div className="category-block-wrapper">
+            <div className="category-block-wrapper" onClick={e => moveToCategory('Jeans')}>
               <div id="jeans-block" className="category-block-bg"></div>
               <h4>Jeans</h4>
             </div>
@@ -55,13 +60,13 @@ function Home() {
         </div>
         <div className="row g-0">
           <div className="col">
-            <div className="category-block-wrapper">
+            <div className="category-block-wrapper" onClick={e => moveToCategory('Sweatpants')}>
               <div id="sweatpants-block" className="category-block-bg"></div>
               <h4> Sweatpants</h4>
             </div>
           </div>
           <div className="col">
-            <div className="category-block-wrapper">
+            <div className="category-block-wrapper" onClick={e => moveToCategory('Jackets')}>
               <div id="jackets-block" className="category-block-bg"></div>
               <h4>Jackets</h4>
             </div>

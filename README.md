@@ -64,12 +64,14 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [X] Write Unit test for some primary features
 - [X] Set up **Kong API Gateway**
 - [ ] Logging request using **Kong API Gateway** and **ELK Stack**
-- [ ] Build detail product page
+- [x] Build detail product page
+- [ ] Complete the cursor pagination of the product list at products page
 - [ ] Complete the main functions and ready for release.
   
 ### V2
 
-- [ ] Using **Elasticsearch** for searching product
+- [ ] Run automated unit tests for services
+- [ ] Use **Elasticsearch** for searching product
 - [ ] Caching using HTTP Header on **product-service**
 
 ## Run a project locally
