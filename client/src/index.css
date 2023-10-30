@@ -36,6 +36,25 @@ button {
   background-color: transparent;
 }
 
+.btn-swagflow {
+  background-color: var(--dark-gold);
+  box-shadow: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-color: transparent;
+}
+.btn-swagflow:hover {
+  color: white;
+  background-color: var(--light-gold);
+  border-color: transparent;
+}
+.btn-swagflow:active {
+  background-color: var(--white-pink);
+  box-shadow: none;
+  border-color: transparent;
+}
+
 /* ---------------Header ----------- */
 .header-background {
   background-color: var(--dark-green);

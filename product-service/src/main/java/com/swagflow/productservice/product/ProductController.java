@@ -76,9 +76,9 @@ public class ProductController {
             @RequestParam(name = "brand",required = false)List<String> brands
     ){
 
-        if(category.equals("all")){
-            return  productService.getProducts(next,limit);
-        }
+//        if(category.equals("all")){
+//            return  productService.getProducts(next,limit);
+//        }
         return productService.getProducts(next,limit,category,brands);
     }
 

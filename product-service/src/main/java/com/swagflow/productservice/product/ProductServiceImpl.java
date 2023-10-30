@@ -492,20 +492,36 @@ public class ProductServiceImpl implements ProductService {
                 Sort.Order.desc("id")
         );
         Slice<Product> products;
+        boolean isQueryCategory = !category.equals("all");
+        boolean isQueryBrands = brands != null && !brands.isEmpty();
+
+        Specification<Product> finalSpecification = null;
+
+        if(isQueryCategory){
+            finalSpecification = where(ProductSpecification.belongsToCategory(category));
+        }
 
 
-        Specification<Product> finalSpecification = where(ProductSpecification.belongsToCategory(category));
-        if(brands != null && !brands.isEmpty()){
-
-            finalSpecification = finalSpecification.and(ProductSpecification.inTheseBrand(brands));
+        if(isQueryBrands){
+            if(isQueryCategory){
+                finalSpecification = finalSpecification.and(ProductSpecification.inTheseBrand(brands));
+            }else{
+                finalSpecification = where(ProductSpecification.inTheseBrand(brands));
+            }
         }
 
 
         // nextCursor == null meaning this is the first page
         if (nextCursor == null) {
 
-            products = productRepository.getProduct().findAll(finalSpecification,
-                    PageRequest.of(0, limit, cursorSort));
+            if(isQueryBrands || isQueryCategory){
+                products = productRepository.getProduct().findAll(finalSpecification,
+                        PageRequest.of(0, limit, cursorSort));
+            }else{
+                products = productRepository.getProduct().findAll(
+                        PageRequest.of(0, limit, cursorSort));
+            }
+
         } else {
             // Get createdAt and id from nextCursor string
             PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
@@ -516,9 +532,13 @@ public class ProductServiceImpl implements ProductService {
                     paginationCursor.getId()
             );
 
-            finalSpecification= finalSpecification.and(cursorSpecification);
+            if(isQueryCategory | isQueryBrands){
+                finalSpecification= finalSpecification.and(cursorSpecification);
+                products = productRepository.getProduct().findAll(finalSpecification, PageRequest.of(0, limit, cursorSort));
+            }else {
+                products = productRepository.getProduct().findAll(cursorSpecification, PageRequest.of(0, limit, cursorSort));
+            }
 
-            products = productRepository.getProduct().findAll(finalSpecification, PageRequest.of(0, limit, cursorSort));
         }
 
 
@@ -529,12 +549,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         List<Product> data = products.getContent();
-        String nextCursorKey = PaginationCursorEncoderDecoder.encode(
-                new PaginationCursor(
-                        data.get(data.size() - 1).getCreatedAt(),
-                        data.get(data.size() - 1).getId()
-                )
-        );
+        String nextCursorKey = null;
+        if(products.hasNext()){
+            nextCursorKey = PaginationCursorEncoderDecoder.encode(
+                    new PaginationCursor(
+                            data.get(data.size() - 1).getCreatedAt(),
+                            data.get(data.size() - 1).getId()
+                    )
+            );
+        }
 
         return ProductResponseCursorPagination.builder()
                 .nextPageCursor(nextCursorKey)

@@ -3,14 +3,10 @@ import ProductCard from "../components/ProductCard"
 import { Product } from "../interfaces/product"
 import RadioFilter from "../components/RadioFilter"
 import { SimplePair } from "../interfaces/simplepair"
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import CheckboxFilter from "../components/CheckboxFilter"
 import axios from "../api/axios"
-import {  PRODUCT_SERVICE_PATH } from "../config/apiRoute"
+import { PRODUCT_SERVICE_PATH } from "../config/apiRoute"
 
 function Products() {
   const navigate = useNavigate()
@@ -18,7 +14,7 @@ function Products() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<SimplePair[]>([])
   const [brands, setBrands] = useState<SimplePair[]>([])
-  let nextPage = ""
+  const [nextPage, setNextPage] = useState("")
 
   let { category } = useParams()
   let brandFilters: string[] = []
@@ -31,11 +27,14 @@ function Products() {
     }
   }
 
-  function getApiUrlFilter(): string {
+  function getApiUrlFilter(next: string | null): string {
     const apiPath = `${PRODUCT_SERVICE_PATH}/products/${category}?`
     let queryFilterParams: string[] = []
 
     queryFilterParams.push("limit=9")
+    if (next) {
+      queryFilterParams.push(`next=${next}`)
+    }
 
     if (brandFilters.length > 0) {
       const brandQuery: string[] = []
@@ -79,11 +78,13 @@ function Products() {
     }
 
     try {
-      const res = await axios.get(getApiUrlFilter())
+      const res = await axios.get(getApiUrlFilter(null))
 
       if (res.status === 200) {
         const resJson = JSON.parse(res.data)
-        nextPage = resJson["next_page"]
+
+        setNextPage(resJson["next_page"])
+        // console.log(nextPage);
         setProducts(resJson.data)
       } else {
         console.log("fetch error at fetchProducts ", res)
@@ -138,6 +139,30 @@ function Products() {
     fetchProducts()
   }
 
+  async function fetchNextPage(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) {
+    if (!nextPage) {
+      console.log("wtf")
+      return
+    }
+
+    try {
+      console.log(nextPage)
+      const res = await axios.get(getApiUrlFilter(nextPage))
+
+      if (res.status === 200) {
+        const resJson = JSON.parse(res.data)
+        setNextPage(resJson["next_page"])
+        setProducts([...products, ...resJson.data])
+      } else {
+        console.log("fetch error at fetchProducts ", res)
+      }
+    } catch (error) {
+      console.log("fetch error at fetchProducts ", error)
+    }
+  }
+
   return (
     <>
       <div className="products-wrapper">
@@ -163,14 +188,6 @@ function Products() {
         </section>
         <section className="product-list-wrapper mb-5">
           <div className="row row-cols-3 gy-4">
-            {/* <div className="column d-flex justify-content-center">
-              <ProductCard
-                src="https://images.meesho.com/images/products/51101648/vwud0_512.webp"
-                title="Product title"
-                brand="Some brand"
-                price={10.5}
-              />
-            </div> */}
             {products.map((product) => {
               let cover = ""
               if (product.images.length > 0) {
@@ -191,6 +208,14 @@ function Products() {
                 </div>
               )
             })}
+          </div>
+          {/* <div className="d-flex justify-content-center mt-4"></div> */}
+          <div className="d-grid gap-2 col-6 mx-auto mt-4">
+            {nextPage !== null && (
+              <button className="btn btn-swagflow" onClick={fetchNextPage}>
+                LOAD MORE
+              </button>
+            )}
           </div>
         </section>
       </div>
