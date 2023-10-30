@@ -15,7 +15,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
-      - elastic
+      - elastic-network
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.3
@@ -28,7 +28,7 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - elastic
+      - elastic-network
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.3.3
@@ -44,12 +44,13 @@ services:
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-      - elastic
+      - elastic-network
     depends_on:
       - elasticsearch
 
 networks:
-  elastic:
+  elastic-network:
+    name: swagflow-network
     driver: bridge
 
 volumes:

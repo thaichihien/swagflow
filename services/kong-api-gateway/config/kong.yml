@@ -44,7 +44,7 @@ jwt_secrets:
 plugins:
 - name: tcp-log
   config:
-    host: 127.0.0.1
-    port: 9999
+    host: logstash
+    port: 5000
 
 
