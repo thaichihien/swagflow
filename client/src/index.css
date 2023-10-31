@@ -378,7 +378,7 @@ footer h4 {
 .btn-add-fav {
   background-color: var(--dark-gold);
   font-size: 1.2rem;
-  right: 75px;
+  right: 20px;
 }
 
 .product-card p {

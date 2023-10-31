@@ -189,22 +189,12 @@ function Products() {
         <section className="product-list-wrapper mb-5">
           <div className="row row-cols-3 gy-4">
             {products.map((product) => {
-              let cover = ""
-              if (product.images.length > 0) {
-                cover = product.images[0]
-              }
               return (
                 <div
                   className="column d-flex justify-content-center"
                   key={product.id}
                 >
-                  <ProductCard
-                    id={product.id}
-                    src={cover}
-                    title={product.name}
-                    brand={product.brand}
-                    price={product.price}
-                  />
+                  <ProductCard product={product} />
                 </div>
               )
             })}

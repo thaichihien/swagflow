@@ -1,8 +1,13 @@
 import React, { FormEvent, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import axios from "../api/axios"
-import { PRODUCT_SERVICE_PATH } from "../config/apiRoute"
+import axios, { privateAxios } from "../api/axios"
+import { CART_SERVICE_PATH, PRODUCT_SERVICE_PATH } from "../config/apiRoute"
 import { ProductDetails } from "../interfaces/product-details"
+import { useAppSelector } from "../app/hooks"
+import { selectCurrentToken } from "../features/auth/authenticationSlice"
+import { toast } from "react-toastify"
+import { useDispatch } from "react-redux"
+import { increaseQuantityByOne } from "../features/cart/cartSlice"
 
 type Props = {}
 
@@ -11,6 +16,7 @@ function ProductDetail({}: Props) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedSize, setSelectedSize] = useState(0)
   let { id } = useParams()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     fetchProductDetail()
@@ -35,6 +41,53 @@ function ProductDetail({}: Props) {
     } catch (error) {
       console.log("fetch error at fetchProducts ", error)
     }
+  }
+
+  const token = useAppSelector(selectCurrentToken)
+
+  async function handleAddToCart(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): Promise<void> {
+    // TODO call /carts/items/:productId
+
+    let config = {}
+
+    if (token) {
+      config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    }
+
+    
+
+    try {
+      const response = await privateAxios.put(
+        `${CART_SERVICE_PATH}/items/${productDetails?.id}/size/${productDetails?.sizes[selectedSize].name}`,
+        null,
+        config,
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        toast.success(`Added product to cart`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        })
+        dispatch(increaseQuantityByOne())
+      }
+    } catch (error) {
+      toast.error("Added to cart error")
+      console.log(error)
+    }
+
+    // if success show toast
   }
 
   function addLineBreak(description: string | undefined): React.ReactNode {
@@ -97,6 +150,10 @@ function ProductDetail({}: Props) {
               </label>
               <select
                 //value={selectedSize}
+                value={selectedSize}
+                onChange={e => {
+                  setSelectedSize(+e.target.value)
+                }}
                 className="form-select"
                 id="inputGroupSelect01"
               >
@@ -105,10 +162,7 @@ function ProductDetail({}: Props) {
                     key={index}
                     value={index}
                     selected={index == selectedSize}
-
-                    onChange={(e) => {
-                      setSelectedSize(index)
-                    }}
+                  
                   >
                     {`${size.name} (${size.quantity})`}
                   </option>
@@ -119,6 +173,7 @@ function ProductDetail({}: Props) {
               <button
                 className="btn btn-add-product-to-cart btn-lg"
                 type="button"
+                onClick={handleAddToCart}
               >
                 ADD TO CART
               </button>

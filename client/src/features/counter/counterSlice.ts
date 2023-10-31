@@ -30,7 +30,7 @@ export const counterSlice = createSlice({
   name: "counter",
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
-  reducers: {
+  reducers: { 
     increment: (state) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,

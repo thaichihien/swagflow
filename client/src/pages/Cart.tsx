@@ -1,8 +1,9 @@
 import React, { useEffect } from "react"
-import CartItem from "../components/CartItem"
+
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import { getCart, selectCart } from "../features/cart/cartSlice"
 import { selectCurrentToken } from "../features/auth/authenticationSlice"
+import CartItemCard from "../components/CartItemCard"
 
 type Props = {}
 
@@ -19,8 +20,8 @@ function Cart({}: Props) {
   return (
     <div className="cart-wrapper">
       <section className="cart-shopping-wrapper">
-        {cartResponse.cart.items.map((item) => (
-          <CartItem product={item.product} quantity={item.quantity} />
+        {cartResponse.cart.items.map((product) => (
+          <CartItemCard item={product} />
         ))}
       </section>
       <section className="checkout-wrapper">
@@ -31,23 +32,25 @@ function Cart({}: Props) {
             <div className="row">
               <div className="col">Items</div>
               <div className="col text-end">
-                {cartResponse.cart.items.length}
+                {cartResponse.cart.totalQuantity}
               </div>
             </div>
             <div className="row">
               <div className="col">Subtotal</div>
-              <div className="col text-end">{cartResponse.cart.totalPrice} EUR</div>
+              <div className="col text-end">
+                {cartResponse.cart.totalPrice} EUR
+              </div>
             </div>
             <div className="row">
               <div className="col">Shipping</div>
-              <div className="col text-end">25</div>
+              <div className="col text-end">25 EUR</div>
             </div>
             <div className="divider my-3"></div>
             <div className="row">
               <div className="col">
                 <h4 className="fw-bold">Total</h4>
               </div>
-              <div className="col text-end">25</div>
+              <div className="col text-end">{(cartResponse.cart.totalPrice + 25).toFixed(2)} EUR</div>
             </div>
           </div>
         </div>

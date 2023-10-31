@@ -11,8 +11,6 @@ export class Cart extends Document{
     @Prop()
     customerId : string;
 
-    @Prop()
-    totalPrice : number;
 
     @Prop([{ type: CartItem }])
     items : CartItem[]

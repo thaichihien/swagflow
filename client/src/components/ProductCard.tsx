@@ -7,16 +7,13 @@ import { CART_SERVICE_PATH } from "../config/apiRoute"
 import { useAppSelector } from "../app/hooks"
 import { selectCurrentToken } from "../features/auth/authenticationSlice"
 import { useNavigate } from "react-router-dom"
+import { Product } from "../interfaces/product"
 
 type Props = {
-  id: string
-  src: string
-  title: string
-  brand: string
-  price: number
+  product : Product
 }
 
-const ProductCard = (props: Props) => {
+const ProductCard = ( {product}: Props) => {
   const token = useAppSelector(selectCurrentToken)
   const navigate = useNavigate()
 
@@ -37,7 +34,7 @@ const ProductCard = (props: Props) => {
 
     try {
       const response = await privateAxios.put(
-        `${CART_SERVICE_PATH}/items/${props.id}`,
+        `${CART_SERVICE_PATH}/items/${product.id}}`,
         null,
         config,
       )
@@ -65,7 +62,12 @@ const ProductCard = (props: Props) => {
   function moveToDetail(
     event: React.MouseEvent<HTMLHeadingElement, MouseEvent>,
   ): void {
-    navigate(`/product/${props.id}`)
+    navigate(`/product/${product.id}`)
+  }
+
+  let cover = ""
+  if (product.images.length > 0) {
+    cover = product.images[0]
   }
 
   return (
@@ -73,20 +75,20 @@ const ProductCard = (props: Props) => {
       <div className="product-image-wrapper">
         <img
           onClick={moveToDetail}
-          src={props.src}
+          src={cover}
           className="card-img-top"
           alt="..."
         />
         <button className="btn btn-on-product btn-add-fav">
           <BsFillSuitHeartFill />
         </button>
-        <button
+        {/* <button
           className="btn btn-on-product btn-add-cart"
           onClick={handleAddToCart}
           //disabled={true}
         >
           <BsFillCartPlusFill />
-        </button>
+        </button> */}
       </div>
       <div className="card-body">
         <h4
@@ -94,11 +96,11 @@ const ProductCard = (props: Props) => {
           style={{ cursor: "pointer" }}
           onClick={moveToDetail}
         >
-          {props.title}
+          {product.name}
         </h4>
         <div className="d-flex justify-content-between">
-          <p className="card-text fs-6">{props.brand}</p>
-          <p className="card-text fs-6">{props.price} EUR</p>
+          <p className="card-text fs-6">{product.brand}</p>
+          <p className="card-text fs-6">{product.price} EUR</p>
         </div>
       </div>
     </div>

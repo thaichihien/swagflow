@@ -12,10 +12,11 @@ function LoginForm({}: Props) {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = location.state?.from?.pathname || "/playground"
+  const from = location.state?.from?.pathname || "/"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
   async function handleLoginSubmit(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -30,7 +31,8 @@ function LoginForm({}: Props) {
 
       dispatch(setCredentials(res))
       navigate(from, { replace: true })
-    } catch (error) {
+    } catch (error: any) {
+      setErrorMessage(error.data.message)
       console.log(error)
     }
   }
@@ -72,8 +74,13 @@ function LoginForm({}: Props) {
           Check me out
         </label>
       </div>
+      <div className="form-text mb-3 text-danger">{errorMessage}</div>
       <div className="d-grid gap-2">
-        <button className="btn btn-success" onClick={handleLoginSubmit}>
+        <button
+          className="btn btn-success"
+          disabled={isLoading}
+          onClick={handleLoginSubmit}
+        >
           Submit
         </button>
       </div>

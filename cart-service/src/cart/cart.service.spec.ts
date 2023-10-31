@@ -40,16 +40,28 @@ describe('CartService', () => {
     hIncrBy: jest.fn(),
     hDel: jest.fn(),
   };
+
+  const productInput = [
+    {
+      productId: '12210375-7327-45f1-8cf3-8e09443bde35',
+      size: 'S',
+    },
+    {
+      productId: '13e18047-f27d-4031-91f0-7a1763165c08',
+      size: 'M',
+    },
+  ];
+
   const cartRedis = {
-    '12210375-7327-45f1-8cf3-8e09443bde35': '1',
-    '13e18047-f27d-4031-91f0-7a1763165c08': '2',
+    '12210375-7327-45f1-8cf3-8e09443bde35#S': '1',
+    '13e18047-f27d-4031-91f0-7a1763165c08#M': '2',
   };
   const productDetailSuccessResponse: RabbitMQResponse<ProductDetailDto[]> = {
     success: true,
     message: 'get all product details successfully',
     data: [
       {
-        id: '12210375-7327-45f1-8cf3-8e09443bde35',
+        id: productInput[0].productId,
         name: 'Nsw Bomber',
         price: 138.54,
         category: 'Jackets',
@@ -59,7 +71,7 @@ describe('CartService', () => {
           'Color: black\nManufacturer color: black/black/white\nMaterial composition: 100% Polyester',
       },
       {
-        id: '13e18047-f27d-4031-91f0-7a1763165c08',
+        id: productInput[1].productId,
         name: 'Levis Eastport Utility Parka',
         price: 241.99,
         category: 'Jackets',
@@ -95,7 +107,7 @@ describe('CartService', () => {
     items: [
       {
         product: {
-          id: '12210375-7327-45f1-8cf3-8e09443bde35',
+          id: productInput[0].productId,
           name: 'Nsw Bomber',
           price: 138.54,
           category: 'Jackets',
@@ -105,10 +117,11 @@ describe('CartService', () => {
             'Color: black\nManufacturer color: black/black/white\nMaterial composition: 100% Polyester',
         },
         quantity: 1,
+        selectedSize: productInput[0].size,
       },
       {
         product: {
-          id: '13e18047-f27d-4031-91f0-7a1763165c08',
+          id: productInput[1].productId,
           name: 'Levis Eastport Utility Parka',
           price: 241.99,
           category: 'Jackets',
@@ -118,6 +131,7 @@ describe('CartService', () => {
             'Color: green\nManufacturer color: ponderosa pine\nMaterial composition: 54% Cotton, 46% Polyester',
         },
         quantity: 2,
+        selectedSize: productInput[1].size,
       },
     ],
   };
@@ -173,7 +187,7 @@ describe('CartService', () => {
 
       expect(cart.items.length).toEqual(2);
       expect(cart.items).toEqual(cartResponse.items);
-      expect(cart.totalPrice).toBeGreaterThan(0)
+      expect(cart.totalPrice).toBeGreaterThan(0);
     });
 
     it('should throw an InternalServerErrorException if there is an error from product-service', async () => {
@@ -196,7 +210,11 @@ describe('CartService', () => {
         .spyOn(messagingService, 'send')
         .mockResolvedValue(productDetailSuccessResponse);
 
-      const cart = await service.addItemToCartSession(cartRedis[0], cartId);
+      const cart = await service.addItemToCartSession(
+        productInput[0].productId,
+        productInput[0].size,
+        cartId,
+      );
 
       expect(redisService.hIncrBy).toHaveBeenCalled();
       expect(cart.items.length).toEqual(2);
@@ -211,7 +229,8 @@ describe('CartService', () => {
         .mockResolvedValue(productDetailSuccessResponse);
 
       const cart = await service.removeItemFromCartSession(
-        cartRedis[0],
+        productInput[0].productId,
+        productInput[0].size,
         cartId,
       );
 
@@ -293,37 +312,24 @@ describe('CartService', () => {
     });
   });
   describe('addItemToCart', () => {
-    const cartDB: CartEntity = {
-      id: 'cart-id',
-      customerId: 'customer-id',
-      totalPrice: 0,
-      items: [
-        {
-          productId: '12210375-7327-45f1-8cf3-8e09443bde35',
-          quantity: 1,
-        },
-        {
-          productId: '13e18047-f27d-4031-91f0-7a1763165c08',
-          quantity: 2,
-        },
-      ],
-    };
     const oldCartDB: CartEntity = {
       id: 'cart-id',
       customerId: 'customer-id',
       totalPrice: 0,
       items: [
         {
-          productId: '12210375-7327-45f1-8cf3-8e09443bde35',
+          productSizeId: '12210375-7327-45f1-8cf3-8e09443bde35#S',
           quantity: 1,
         },
         {
-          productId: '13e18047-f27d-4031-91f0-7a1763165c08',
+          productSizeId: '13e18047-f27d-4031-91f0-7a1763165c08#M',
           quantity: 2,
         },
       ],
     };
-    const productDetailSuccessResponseWithNewItem: RabbitMQResponse<ProductDetailDto[]> = {
+    const productDetailSuccessResponseWithNewItem: RabbitMQResponse<
+      ProductDetailDto[]
+    > = {
       success: true,
       message: 'get all product details successfully',
       data: [
@@ -361,6 +367,22 @@ describe('CartService', () => {
     };
 
     it('should return cart with new lenghth if adding an new item to cart successfully', async () => {
+      const cartDB: CartEntity = {
+        id: 'cart-id',
+        customerId: 'customer-id',
+        totalPrice: 0,
+        items: [
+          {
+            productSizeId: '12210375-7327-45f1-8cf3-8e09443bde35#S',
+            quantity: 1,
+          },
+          {
+            productSizeId: '13e18047-f27d-4031-91f0-7a1763165c08#M',
+            quantity: 2,
+          },
+        ],
+      };
+
       jest
         .spyOn(messagingService, 'send')
         .mockResolvedValue(customerProfileSuccessResponse);
@@ -370,14 +392,34 @@ describe('CartService', () => {
         .spyOn(messagingService, 'send')
         .mockResolvedValue(productDetailSuccessResponseWithNewItem);
       const newProductId = 'new-product-id';
+      const newProductSize = 'XL';
 
-      const newCart = await service.addItemToCart(newProductId, customerToken);
+      const newCart = await service.addItemToCart(
+        newProductId,
+        newProductSize,
+        customerToken,
+      );
 
       expect(newCart.items.length).toEqual(oldCartDB.items.length + 1);
       expect(dataServices.cart.update).toHaveBeenCalled();
     });
 
     it('should return cart with a product with quantity increased by one if adding an existing item to cart successfully', async () => {
+      const cartDB: CartEntity = {
+        id: 'cart-id',
+        customerId: 'customer-id',
+        totalPrice: 0,
+        items: [
+          {
+            productSizeId: '12210375-7327-45f1-8cf3-8e09443bde35#S',
+            quantity: 1,
+          },
+          {
+            productSizeId: '13e18047-f27d-4031-91f0-7a1763165c08#M',
+            quantity: 2,
+          },
+        ],
+      };
       jest
         .spyOn(messagingService, 'send')
         .mockResolvedValue(customerProfileSuccessResponse);
@@ -387,16 +429,18 @@ describe('CartService', () => {
         .spyOn(messagingService, 'send')
         .mockResolvedValue(productDetailSuccessResponse);
       const oldProduct = oldCartDB.items[0];
+      const oldProductId = oldProduct.productSizeId.split('#')[0];
+      const oldProductSize = oldProduct.productSizeId.split('#')[1];
 
       const newCart = await service.addItemToCart(
-        oldProduct.productId,
+        oldProductId,
+        oldProductSize,
         customerToken,
       );
 
       expect(newCart.items.length).toEqual(oldCartDB.items.length);
       expect(
-        newCart.items.find((p) => p.product.id == oldProduct.productId)
-          .quantity,
+        newCart.items.find((p) => p.product.id == oldProductId).quantity,
       ).toEqual(oldProduct.quantity + 1);
       expect(dataServices.cart.update).toHaveBeenCalled();
     });

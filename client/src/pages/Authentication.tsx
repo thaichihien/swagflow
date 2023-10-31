@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import React, { useEffect, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
 import RegisterForm from "../components/RegisterForm"
 import LoginForm from "../components/LoginForm"
 
@@ -7,10 +7,17 @@ type Props = {}
 
 function Authentication({}: Props) {
   const [activeTab, setActiveTab] = useState(0)
+  const { hash } = useLocation()
 
   const handleTabClick = (index: number) => {
     setActiveTab(index)
   }
+
+  useEffect(() => {
+    if (hash === "#signup" && activeTab !== 1) {
+      setActiveTab(1)
+    } 
+  }, [])
   return (
     <>
       <div

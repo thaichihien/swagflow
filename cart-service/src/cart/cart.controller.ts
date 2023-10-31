@@ -30,33 +30,35 @@ export class CartController {
   }
 
   @ApiOperation({ summary: 'Add a item to cart' })
-  @Put('/items/:productId')
+  @Put('/items/:productId/size/:size')
   async addProductToCart(
     @Param('productId') productId: string,
+    @Param('size') size: string,
     @Session() sess: session.Session,
   ): Promise<CartResDto> {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.addItemToCartSession(productId, cartId);
+      return await this.cartService.addItemToCartSession(productId,size, cartId);
     } else {
       const token = sess['user'];
       //console.log("addProductToCart:",token);
-      return await this.cartService.addItemToCart(productId, token);
+      return await this.cartService.addItemToCart(productId,size, token);
     }
   }
 
   @ApiOperation({ summary: 'Remove a item from cart' })
-  @Delete('/items/:productId')
+  @Delete('/items/:productId/size/:size')
   async removeProductFromCart(
     @Param('productId') productId: string,
+    @Param('size') size: string,
     @Session() sess: session.Session,
   ): Promise<CartResDto> {
     const cartId = sess['cart_id'];
     if (sess['anonymous']) {
-      return await this.cartService.removeItemFromCartSession(productId, cartId);
+      return await this.cartService.removeItemFromCartSession(productId,size, cartId);
     } else {
       const token = sess['user'];
-      return await this.cartService.removeItemFromCart(productId, token);
+      return await this.cartService.removeItemFromCart(productId,size, token);
     }
   }
 

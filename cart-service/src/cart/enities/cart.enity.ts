@@ -5,7 +5,5 @@ export class CartEntity {
   id: string;
   customerId: string;
 
-  totalPrice: number;
-
   items: CartItem[];
 }

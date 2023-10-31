@@ -10,9 +10,11 @@ import {
   setProfile,
 } from "../features/auth/authenticationSlice"
 import { useProfileMutation } from "../features/auth/authenticationApiSlice"
+import { getCart, selectCart } from "../features/cart/cartSlice"
 
 function Header() {
   const [searching, setSearching] = useState(false)
+  const cartResponse = useAppSelector(selectCart)
 
   const token = useAppSelector(selectCurrentToken)
   const profile = useAppSelector(selectCurrentUser)
@@ -30,6 +32,8 @@ function Header() {
           dispatch(setProfile(res))
         })
     }
+
+    dispatch(getCart(token))
   }, [])
 
   function switchToSearch(event: any): void {
@@ -86,31 +90,59 @@ function Header() {
                       role="button"
                       aria-expanded="false"
                     >
-                      Dropdown
+                      Top
                     </a>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Action
-                        </a>
+                        <Link className="dropdown-item" to="/products/T-Shirts">
+                          T-Shirts
+                        </Link>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Another action
-                        </a>
+                        <Link className="dropdown-item" to="/products/Jackets">
+                          Jackets
+                        </Link>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Something else here
-                        </a>
+                        <Link className="dropdown-item" to="/products/Hoodies">
+                          Hoodies
+                        </Link>
+                      </li>
+                    </ul>
+                  </li>
+                  <li className="nav-item dropdown">
+                    <a
+                      className="nav-link dropdown-toggle"
+                      data-bs-toggle="dropdown"
+                      href="#"
+                      role="button"
+                      aria-expanded="false"
+                    >
+                      Bottoms
+                    </a>
+                    <ul className="dropdown-menu">
+                      <li>
+                        <Link className="dropdown-item" to="/products/Shorts">
+                          Shorts
+                        </Link>
                       </li>
                       <li>
-                        <hr className="dropdown-divider" />
+                        <Link
+                          className="dropdown-item"
+                          to="/products/Sweatpants"
+                        >
+                          Sweatpants
+                        </Link>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Separated link
-                        </a>
+                        <Link className="dropdown-item" to="/products/Jeans">
+                          Jeans
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="dropdown-item" to="/products/Baggies">
+                          Baggies
+                        </Link>
                       </li>
                     </ul>
                   </li>
@@ -149,12 +181,12 @@ function Header() {
                       {token == null ? (
                         <>
                           <li>
-                            <Link className="dropdown-item" to="/auth">
+                            <Link className="dropdown-item" to="/auth#signin">
                               Sign In
                             </Link>
                           </li>
                           <li>
-                            <Link className="dropdown-item" to="/auth">
+                            <Link className="dropdown-item" to="/auth#signup">
                               Sign Up
                             </Link>
                           </li>
@@ -182,7 +214,7 @@ function Header() {
                 <li>
                   <Link className="header-icon" to="/cart">
                     <BsCart2 className="fs-4" />
-                    <span className="badge badge-warning lblCartCount">15</span>
+                    <span className="badge badge-warning lblCartCount">{cartResponse.cart.totalQuantity}</span>
                   </Link>
                 </li>
               </ul>

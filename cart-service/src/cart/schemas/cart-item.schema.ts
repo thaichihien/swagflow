@@ -7,7 +7,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 export class CartItem{
 
     @Prop()
-    productId : string
+    productSizeId : string
 
     @Prop()
     quantity: number

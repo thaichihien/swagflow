@@ -2,6 +2,7 @@ import React, { useEffect, useRef, forwardRef, ForwardedRef } from "react"
 import ProductCard from "./ProductCard"
 import { Product } from "../interfaces/product"
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from "react-icons/ai"
+import { useNavigate } from "react-router-dom"
 
 type MyCarouselProps = {
   products: Product[]
@@ -10,6 +11,7 @@ type MyCarouselProps = {
 const ProductCarousel = forwardRef(
   (props: MyCarouselProps, ref: ForwardedRef<HTMLDivElement>) => {
     const carouselRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
       if (carouselRef.current) {
@@ -30,6 +32,10 @@ const ProductCarousel = forwardRef(
         })
       }
     }, [props.products])
+
+    function moveToDetail(productId: string): void {
+      navigate(`/product/${productId}`)
+    }
 
     return (
       <div ref={carouselRef as ForwardedRef<HTMLDivElement>}>
@@ -61,37 +67,21 @@ const ProductCarousel = forwardRef(
               </div>
 
               <div className="carousel-inner" role="listbox">
-                {/* <div className="carousel-item active">
-                  <div className="col-md-3">
-                    <ProductCard
-                      src="https://images.meesho.com/images/products/51101648/vwud0_512.webp"
-                      title="Product title 1"
-                      brand="Some brand"
-                      price={10.5}
-                    />
-                  </div>
-                </div> */}
                 {props.products.map((product, index) => {
-                  let cover = ""
-                  if (product.images.length > 0) {
-                    cover = product.images[0]
-                  }
-
                   return (
                     <div
                       key={product.id}
+                      onClick={(e) => {
+                        if (index != 0) {
+                          moveToDetail(product.id)
+                        }
+                      }}
                       className={
                         index == 0 ? "carousel-item active" : "carousel-item"
                       }
                     >
                       <div className="col-md-3">
-                        <ProductCard
-                          id={product.id}
-                          src={cover}
-                          title={product.name}
-                          brand={product.brand}
-                          price={product.price}
-                        />
+                        <ProductCard product={product} />
                       </div>
                     </div>
                   )

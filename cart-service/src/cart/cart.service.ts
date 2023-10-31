@@ -19,7 +19,6 @@ import { MessagingService } from 'src/messaging/messaging.service';
 import { ProductDetailDto } from './dto/product-detail.dto';
 import { CartEntity } from './enities/cart.enity';
 
-
 @Injectable()
 export class CartService {
   private readonly logger = new Logger(CartService.name);
@@ -35,6 +34,7 @@ export class CartService {
   async findCartSession(cartId: string) {
     const cartResponse: CartResDto = {
       totalPrice: 0,
+      totalQuantity : 0,
       items: [],
     };
     const cart = await this.redisService.hGetAll(this.getCartKey(cartId));
@@ -47,54 +47,81 @@ export class CartService {
     const response = await this.messagingService.send<
       ProductDetailDto[],
       string[]
-    >(Object.keys(cart), this.messagingService.PRODUCTS_DETAIL_QUEUE);
+    >(
+      Object.keys(cart).map((item) => {
+        return item.split('#')[0];
+      }),
+      this.messagingService.PRODUCTS_DETAIL_QUEUE,
+    );
 
     if (!response.success) {
       this.logger.error(response.message);
       throw new InternalServerErrorException('communication error');
     }
 
+    const productMap = new Map<string, ProductDetailDto>(
+      response.data.map((item) => [item.id, item]),
+    );
+
     let totalPrice = 0;
-    for (const product of response.data) {
+    let totalQuantity = 0
+    // for (const product of response.data) {
+    //   const item: CartItemResDto = {
+    //     product: product,
+    //     quantity: +cart[product.id],
+    //   };
+
+    //   totalPrice += item.product.price * item.quantity;
+    //   cartResponse.items.push(item);
+    // }
+    for (const productIdSize of Object.keys(cart)) {
+      const p = productIdSize.split('#');
       const item: CartItemResDto = {
-        product: product,
-        quantity: +cart[product.id],
+        product: productMap.get(p[0]),
+        quantity: +cart[productIdSize],
+        selectedSize: p[1],
       };
 
+      totalQuantity += item.quantity
       totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
     // TODO calculate price
-    cartResponse.totalPrice = totalPrice;
+    cartResponse.totalPrice = +totalPrice.toFixed(2);
+    cartResponse.totalQuantity = totalQuantity
 
     return cartResponse;
   }
 
-  async addItemToCartSession(productId: string, cartId: string) {
+  async addItemToCartSession(productId: string, size: string, cartId: string) {
     // TODO reduce stock
 
     const quantityInCart =
       (await this.redisService.hGet(
         this.getCartKey(cartId),
-        this.getProductKey(productId),
+        this.getProductKey(productId, size),
       )) || '0';
 
     // -- check product stock before add to cart
     await this.redisService.hIncrBy(
       this.getCartKey(cartId),
-      this.getProductKey(productId),
+      this.getProductKey(productId, size),
       1,
     );
 
     return this.findCartSession(cartId);
   }
 
-  async removeItemFromCartSession(productId: string, cartId: string) {
+  async removeItemFromCartSession(
+    productId: string,
+    size: string,
+    cartId: string,
+  ) {
     // TODO increase stock
 
     await this.redisService.hDel(
       this.getCartKey(cartId),
-      this.getProductKey(productId),
+      this.getProductKey(productId, size),
     );
 
     return this.findCartSession(cartId);
@@ -107,11 +134,8 @@ export class CartService {
       return;
     }
 
-    for (const productId of Object.keys(cart)) {
-      await this.redisService.hDel(
-        this.getCartKey(cartId),
-        this.getProductKey(productId),
-      );
+    for (const productIdSize of Object.keys(cart)) {
+      await this.redisService.hDel(this.getCartKey(cartId), productIdSize);
 
       // TODO increase stock
     }
@@ -121,8 +145,8 @@ export class CartService {
     return `cart:${cardId}`;
   }
 
-  getProductKey(productId: string): string {
-    return productId;
+  getProductKey(productId: string, size: string): string {
+    return `${productId}#${size}`;
   }
 
   // -------------------------------------------
@@ -158,7 +182,7 @@ export class CartService {
     return await this.dataServices.cart.findById(id);
   }
 
-  async addItemToCart(productId: string, token: string) {
+  async addItemToCart(productId: string, size: string, token: string) {
     // - find cart
 
     const customer = await this.getCustomerInfo(token);
@@ -170,13 +194,15 @@ export class CartService {
     }
 
     // - find item in cart, if existed increase quantity else create new item and add to cart
-    const existed = cart.items.find((i) => i.productId === productId);
+    const existed = cart.items.find(
+      (i) => i.productSizeId === this.getProductKey(productId, size),
+    );
 
     if (existed) {
       existed.quantity += 1;
     } else {
       const newCartItem = new CartItem();
-      newCartItem.productId = productId;
+      newCartItem.productSizeId = this.getProductKey(productId, size);
       newCartItem.quantity = 1;
       cart.items.push(newCartItem);
     }
@@ -187,6 +213,7 @@ export class CartService {
     return await this.mapToCartResDto(cart);
   }
 
+  // ! NOT USING NOW
   async changeItemQuantityInCart(
     productId: string,
     quantity: number,
@@ -199,13 +226,13 @@ export class CartService {
     }
 
     // - find item in cart, if existed increase quantity else create new item and add to cart
-    const existed = cart.items.find((i) => i.productId === productId);
+    const existed = cart.items.find((i) => i.productSizeId === productId);
 
     if (existed) {
       existed.quantity = quantity;
     } else {
       const newCartItem = new CartItem();
-      newCartItem.productId = productId;
+      newCartItem.productSizeId = productId;
       newCartItem.quantity = quantity;
       cart.items.push(newCartItem);
     }
@@ -215,7 +242,7 @@ export class CartService {
     return cart;
   }
 
-  async removeItemFromCart(productId: string, token: string) {
+  async removeItemFromCart(productId: string, size: string, token: string) {
     // - find cart
     const customer = await this.getCustomerInfo(token);
 
@@ -226,7 +253,9 @@ export class CartService {
     }
 
     // - find item in cart, remove if existed or throw bad request
-    const index = cart.items.findIndex((i) => i.productId === productId);
+    const index = cart.items.findIndex(
+      (i) => i.productSizeId === this.getProductKey(productId, size),
+    );
 
     if (index < 0) {
       throw new BadRequestException(
@@ -277,12 +306,12 @@ export class CartService {
       throw new ForbiddenException('invalid token');
     }
 
-    //console.log(customer.id)
+    // console.log(customer.id)
 
     // - findByCustomerId(id)
     const cart = await this.findByCustomerId(customer.id);
 
-    console.log(cart);
+    //console.log(cart);
     // - merge items from cart in redux (anonymouse) to cart in mongodb (authenticated) (if existed)
     const mergedCart = await this.mergeGuestCart(cartIdSession, cart);
 
@@ -307,24 +336,25 @@ export class CartService {
       return null;
     }
 
-    for (const productId of Object.keys(cartSession)) {
+    for (const productIdSize of Object.keys(cartSession)) {
       // - find item in cart, if existed increase quantity else create new item and add to cart
-      const existed = cartDB.items.find((i) => i.productId === productId);
+      const productId = productIdSize.split('#')[0];
+      const size = productIdSize.split('#')[1];
+      const existed = cartDB.items.find(
+        (i) => i.productSizeId === productIdSize,
+      );
 
       if (existed) {
-        existed.quantity += +cartSession[productId];
+        existed.quantity += +cartSession[productIdSize];
       } else {
         const newCartItem = new CartItem();
-        newCartItem.productId = productId;
-        newCartItem.quantity = +cartSession[productId];
+        newCartItem.productSizeId = productIdSize;
+        newCartItem.quantity = +cartSession[productIdSize];
         cartDB.items.push(newCartItem);
       }
 
       await this.dataServices.cart.update(cartDB.id, cartDB);
-      await this.redisService.hDel(
-        this.getCartKey(fromCartId),
-        this.getProductKey(productId),
-      );
+      await this.redisService.hDel(this.getCartKey(fromCartId), productIdSize);
     }
 
     return cartDB;
@@ -334,15 +364,14 @@ export class CartService {
     const cartResponse: CartResDto = {
       totalPrice: 0,
       items: [],
+      totalQuantity : 0
     };
-    const cartMap = new Map<string, number>(
-      cart.items.map((item) => [item.productId, item.quantity]),
-    );
+
     const response = await this.messagingService.send<
       ProductDetailDto[],
       string[]
     >(
-      cart.items.map((cartItem) => cartItem.productId),
+      cart.items.map((cartItem) => cartItem.productSizeId.split('#')[0]),
       this.messagingService.PRODUCTS_DETAIL_QUEUE,
     );
 
@@ -351,17 +380,29 @@ export class CartService {
       throw new InternalServerErrorException('communication error');
     }
 
+    const productMap = new Map<string, ProductDetailDto>(
+      response.data.map((item) => [item.id, item]),
+    );
+
     let totalPrice = 0;
-    for (const product of response.data) {
+    let totalQuantity = 0;
+   
+   
+
+    for (const cartItem of cart.items) {
+      //console.log(productMap.get(cartItem.productSizeId.split('#')[0]))
       const item: CartItemResDto = {
-        product: product,
-        quantity: cartMap.get(product.id),
+        product: productMap.get(cartItem.productSizeId.split('#')[0]),
+        quantity: cartItem.quantity,
+        selectedSize: cartItem.productSizeId.split('#')[1],
       };
 
+      totalQuantity += item.quantity
       totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
-    cartResponse.totalPrice = totalPrice;
+    cartResponse.totalPrice = +totalPrice.toFixed(2);
+    cartResponse.totalQuantity = totalQuantity
 
     return cartResponse;
   }

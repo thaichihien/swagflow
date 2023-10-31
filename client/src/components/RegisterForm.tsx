@@ -12,7 +12,7 @@ function RegisterForm({}: Props) {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = location.state?.from?.pathname || "/playground"
+  const from = location.state?.from?.pathname || "/"
   //console.log(location);
 
   const [firstName, setFirstName] = useState("")
@@ -20,6 +20,7 @@ function RegisterForm({}: Props) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [dob, setDob] = useState(new Date())
+  const [errorMessage, setErrorMessage] = useState("")
 
   async function handleRegisterSubmit(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -37,7 +38,8 @@ function RegisterForm({}: Props) {
 
       dispatch(setCredentials(res))
       navigate(from, { replace: true })
-    } catch (error) {
+    } catch (error : any) {
+      setErrorMessage(error.data.message)
       console.log(error)
     }
   }
@@ -115,8 +117,11 @@ function RegisterForm({}: Props) {
           Check me out
         </label>
       </div>
+      <div  className="form-text mb-3 text-danger">
+        {errorMessage}
+      </div>
       <div className="d-grid gap-2">
-        <button className="btn btn-success" onClick={handleRegisterSubmit}>
+        <button className="btn btn-success" onClick={handleRegisterSubmit} disabled={isLoading}>
           Submit
         </button>
       </div>
