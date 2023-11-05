@@ -24,6 +24,7 @@ export class SignUpDto {
 
   @ApiProperty()
   @IsDate()
+  @IsOptional()
   dob : Date
 
   @ApiProperty()

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Tag(name = "Brand")
 @RestController
-@RequestMapping("/api/v1/brand")
+@RequestMapping("brands")
 @RequiredArgsConstructor
 public class BrandController {
 

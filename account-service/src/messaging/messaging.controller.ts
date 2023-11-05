@@ -15,4 +15,6 @@ export class MessagingController {
   async getAccountInfo(body: { message: string }) {
     return await this.messagingService.verifyAndGetAccount(body.message);
   }
+
+  
 }

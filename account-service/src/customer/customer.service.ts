@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { IDataServices } from 'src/repository/data.service.interface';
+import { IDataServices } from 'src/database/data.service.interface';
 import { CustomerProfileDto } from './dto/customer-profile.dto';
 
 @Injectable()

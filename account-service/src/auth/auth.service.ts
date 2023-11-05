@@ -11,7 +11,13 @@ import { SignUpDto } from './dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtPayLoad } from './interfaces/jwt.payload';
-import { Customer } from '@prisma/client';
+import { UserService } from 'src/user/user.service';
+import { RoleService } from 'src/role/role.service';
+import { User } from 'src/user/entities/user.entity';
+import { Customer } from 'src/customer/enity/customer.enity';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
+import { CustomerProfileDto } from 'src/customer/dto/customer-profile.dto';
+import { CustomerProfileFullDto } from 'src/customer/dto/customer-profile-full.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +29,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly customerService: CustomerService,
+    private readonly userService: UserService,
+    private readonly roleService: RoleService,
   ) {}
 
   async signUp(
     signUpDto: SignUpDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    // - check exist
     const existedCustomer = await this.customerService.findOneByEmail(
       signUpDto.email,
     );
@@ -36,16 +43,14 @@ export class AuthService {
     if (existedCustomer) {
       throw new BadRequestException('Username or email is already existed');
     }
-    // - hash password
+
     const hashedPassword = await this.hashPassword(signUpDto.password);
     signUpDto.password = hashedPassword;
-    // - create account
+
     const newAccount = await this.customerService.create(signUpDto);
 
-    // - generate tokens
     const tokens = await this.generateTokens(newAccount.id, newAccount.email);
 
-    // - update refresh token
     await this.updateRefreshToken(newAccount.id, tokens.refreshToken);
 
     return tokens;
@@ -54,7 +59,6 @@ export class AuthService {
   async signIn(
     signInDto: SignInDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    // - check exist
     const existedCustomer = await this.customerService.findOneByEmail(
       signInDto.email,
     );
@@ -63,18 +67,17 @@ export class AuthService {
       throw new BadRequestException('This username is not existed');
     }
 
-    // - verify password
-    if (!(await this.verifyPassword(signInDto.password, existedCustomer.password))) {
+    if (
+      !(await this.verifyPassword(signInDto.password, existedCustomer.password))
+    ) {
       throw new BadRequestException('The password is wrong');
     }
 
-    // - generate tokens
     const tokens = await this.generateTokens(
       existedCustomer.id,
       existedCustomer.email,
     );
 
-    // - update refresh tokens
     await this.updateRefreshToken(existedCustomer.id, tokens.refreshToken);
 
     return tokens;
@@ -84,43 +87,156 @@ export class AuthService {
     id: string,
     refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    // - check exits and refresh token
-
     const existedCustomer = await this.customerService.findOneByID(id);
 
     if (!existedCustomer || !existedCustomer.refreshToken) {
       throw new ForbiddenException('Access denied');
     }
 
-    // - verify refresh token
-    if (!(await this.verifyPassword(refreshToken, existedCustomer.refreshToken))) {
+    if (
+      !(await this.verifyPassword(refreshToken, existedCustomer.refreshToken))
+    ) {
       throw new ForbiddenException('Access denied');
     }
 
-    // - generate tokens
     const tokens = await this.generateTokens(
       existedCustomer.id,
       existedCustomer.email,
     );
 
-    // - update refresh tokens
     await this.updateRefreshToken(existedCustomer.id, tokens.refreshToken);
     return tokens;
   }
 
   async logout(id: string) {
-    // - remove refresh token in db by switching to null
     await this.customerService.saveRefreshToken(id, null);
+  }
+
+  // --------------------------- Admin-----------------
+
+  async signUpUser(
+    signUpDto: SignUpDto,
+    roleName: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    // - check exist
+    const existedUser = await this.userService.findOneByEmail(signUpDto.email);
+
+    if (existedUser) {
+      throw new BadRequestException('Username or email is already existed');
+    }
+
+    // if (roleName === 'admin') {
+    //   const adminRole = await this.roleService.findRoleByNameWithUsers('admin');
+
+    //   if (adminRole.user.length > 1) {
+    //     throw new BadRequestException('Admin account is already existed');
+    //   }
+    // }
+
+    // - hash password
+    const hashedPassword = await this.hashPassword(signUpDto.password);
+    signUpDto.password = hashedPassword;
+
+    const role = await this.roleService.findByNameOrCreated(roleName);
+
+    // - create account
+    const newAccount = await this.userService.create({ ...signUpDto });
+
+    await this.userService.addRole(newAccount.id, role.id);
+
+    // - generate tokens
+    const tokens = await this.generateTokens(
+      newAccount.id,
+      newAccount.email,
+      newAccount.roles,
+    );
+
+    // - update refresh token
+    await this.updateUserRefreshToken(newAccount.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async signInUser(
+    signInDto: SignInDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    // - check exist
+    const existedCustomer = await this.userService.findOneByEmail(
+      signInDto.email,
+    );
+
+    if (!existedCustomer) {
+      throw new BadRequestException('This username is not existed');
+    }
+
+    // - verify password
+    if (
+      !(await this.verifyPassword(signInDto.password, existedCustomer.password))
+    ) {
+      throw new BadRequestException('The password is wrong');
+    }
+
+    const userRoles = await this.userService.findUserRole(existedCustomer.id);
+
+    // - generate tokens
+    const tokens = await this.generateTokens(
+      existedCustomer.id,
+      existedCustomer.email,
+      userRoles,
+    );
+
+    // - update refresh tokens
+    await this.updateUserRefreshToken(existedCustomer.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async refreshTokenUser(
+    id: string,
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    // - check exits and refresh token
+
+    const existedUser = await this.userService.findById(id);
+
+    if (!existedUser || !existedUser.refreshToken) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    // - verify refresh token
+    if (!(await this.verifyPassword(refreshToken, existedUser.refreshToken))) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const roles = await this.userService.findUserRole(existedUser.id);
+
+    // - generate tokens
+    const tokens = await this.generateTokens(
+      existedUser.id,
+      existedUser.email,
+      roles,
+    );
+
+    // - update refresh tokens
+    await this.updateUserRefreshToken(existedUser.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async logoutUser(id: string) {
+    // - remove refresh token in db by switching to null
+    await this.userService.saveRefreshToken(id, null);
   }
 
   private async generateTokens(
     id: string,
     username: string,
+    roles?: string[],
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload: JwtPayLoad = {
       sub: id,
       username: username,
       iss: this.configService.get<string>('ISS_KEY'),
+      roles: roles ?? [],
     };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('ACCESS_SECRET'),
@@ -155,17 +271,27 @@ export class AuthService {
     await this.customerService.saveRefreshToken(id, hashedRefreshToken);
   }
 
-  async verifyUser(token: string): Promise<Customer | null> {
+  private async updateUserRefreshToken(id: string, refreshToken: string) {
+    //- hash refresh token
+    const hashedRefreshToken = await this.hashPassword(refreshToken);
+    //- save hashed refresh token in database
+    await this.userService.saveRefreshToken(id, hashedRefreshToken);
+  }
+
+  async verifyUser(
+    token: string
+  ): Promise<CustomerProfileFullDto | UserResponseDto | null> {
     try {
-      // - verify access token
       const payload: JwtPayLoad = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('ACCESS_SECRET'),
       });
 
-      // - get account from id
-      const user = await this.customerService.findOneByID(payload.sub);
-
-      return user;
+      if (payload.roles.length === 0) {
+        return await this.customerService.findOneByID(payload.sub);
+      } else {
+        const user = await this.userService.findById(payload.sub);
+        return await this.userService.convertToResponse(user);
+      }
     } catch (error) {
       this.logger.error(error);
       return null;

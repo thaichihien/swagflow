@@ -1,8 +1,12 @@
 package com.swagflow.productservice.exception;
 
+import com.swagflow.productservice.exception.response.BadRequestResponse;
+import com.swagflow.productservice.exception.response.ForbiddenResponse;
+import com.swagflow.productservice.exception.response.HttpExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -13,14 +17,19 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleInvalidArgument(IllegalArgumentException e){
+    public HttpExceptionResponse handleInvalidArgument(IllegalArgumentException e){
         //e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return new BadRequestResponse(e.getMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNotFoundElement(NoSuchElementException e){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    public HttpExceptionResponse handleNotFoundElement(NoSuchElementException e){
+        return new BadRequestResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public HttpExceptionResponse handleAccessDenied(AccessDeniedException e){
+        return new ForbiddenResponse(e.getMessage());
     }
 
 

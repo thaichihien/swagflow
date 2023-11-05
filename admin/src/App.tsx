@@ -1,5 +1,3 @@
-import logo from "./logo.svg"
-import { Counter } from "./features/counter/Counter"
 import "./App.css"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Layout from "./pages/Layout"
@@ -9,13 +7,14 @@ import ProductList from "./pages/ProductList"
 import AddProduct from "./pages/AddProduct"
 import Playground from "./pages/Playground"
 import ImportProducts from "./pages/ImportProducts"
-import { ToastContainer } from "react-toastify"
+import Login from "./pages/Login"
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="/products" element={<ProductList/>}/>

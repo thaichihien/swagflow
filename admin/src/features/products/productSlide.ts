@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { serverConfig } from "../../config/env"
+import { privateAxios } from "../../api/axios"
+import { PRODUCT_SERVICE_PATH } from "../../config/apiRoute"
 
 export interface ProductSize {
   name: string
@@ -34,9 +36,29 @@ const initialState: ResponseWrapper<Product[]> = {
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await fetch(serverConfig.endpoint("/product?view=admin"))
-    const data = await response.json()
-    return data
+    try {
+      // let config = {}
+
+      // if (token) {
+      //   config = {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // }
+
+      const response = await privateAxios.get(`${PRODUCT_SERVICE_PATH}/admin`)
+
+      if (response.status === 200) {
+        const resJson = JSON.parse(response.data)
+        return resJson
+      } else {
+        console.log("fetch error at fetchProducts ", response)
+      }
+    } catch (error) {
+      console.log("fetch error at fetchProducts ", error)
+      throw error
+    }
   },
 )
 

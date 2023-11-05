@@ -66,7 +66,9 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [X] Logging request using **Kong API Gateway** and **ELK Stack**
 - [X] Build detail product page
 - [X] Complete the cursor pagination of the product list at products page
-- [X] Complete the main functions and ready for release.
+- [X] Design User Role database for **account-service**
+- [X] Implement Repository Pattern in **account-service**
+- [ ] Complete the main functions and ready for release.
 - [ ] Dockernize all service
   
 ### V2
@@ -74,6 +76,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [ ] Run automated unit tests for services
 - [ ] Use **Elasticsearch** for searching product
 - [ ] Caching using HTTP Header on **product-service**
+- [ ] Implement OAuth from Google
 
 ## Run a project locally
 

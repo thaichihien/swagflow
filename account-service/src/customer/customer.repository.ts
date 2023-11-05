@@ -1,6 +1,6 @@
 import { Customer } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { IRepository } from 'src/repository/repository.interface';
+import { IRepository } from 'src/database/repository.interface';
 
 export class CustomerRepository implements IRepository<Customer> {
   constructor(private prismaService: PrismaService) {}

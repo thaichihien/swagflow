@@ -97,7 +97,7 @@ function Products() {
   async function fetchFilters() {
     if (categories.length <= 0) {
       try {
-        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/category`)
+        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/categories`)
         if (res.status === 200) {
           const resJson = JSON.parse(res.data)
           setCategories(resJson)
@@ -111,7 +111,7 @@ function Products() {
 
     if (brands.length <= 0) {
       try {
-        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/brand`)
+        const res = await axios.get(`${PRODUCT_SERVICE_PATH}/brands`)
         if (res.status === 200) {
           const resJson = JSON.parse(res.data)
           setBrands(resJson)
@@ -143,7 +143,6 @@ function Products() {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) {
     if (!nextPage) {
-      console.log("wtf")
       return
     }
 

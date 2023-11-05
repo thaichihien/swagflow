@@ -20,7 +20,7 @@ import { Request } from 'express';
 
 @UseGuards(AccessTokenGuard)
 @ApiTags('Customer')
-@Controller('customer')
+@Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 

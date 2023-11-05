@@ -23,6 +23,7 @@ export class CreateCustomerDto {
   lastName: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsDate()
   dob : Date
 

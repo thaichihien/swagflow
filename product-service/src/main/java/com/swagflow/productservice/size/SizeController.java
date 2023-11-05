@@ -12,7 +12,7 @@ import java.util.List;
 
 @Tag(name = "Product Size")
 @RestController
-@RequestMapping("/api/v1/size")
+@RequestMapping("size")
 @RequiredArgsConstructor
 @Slf4j
 public class SizeController {
@@ -28,7 +28,7 @@ public class SizeController {
     @Operation
     @GetMapping
     public List<Size> getAllSizes(){
-        log.debug("WTF");
+
         return sizeService.getAllSizes();
     }
 

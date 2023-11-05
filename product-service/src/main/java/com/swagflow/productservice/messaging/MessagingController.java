@@ -47,6 +47,8 @@ public class MessagingController {
 //    }
 
 
+
+
     @RabbitListener(queues = RabbitMQConfig.PRODUCT_DETAIL_QUEUE)
     public RabbitMQResponse<ProductResponse> getProductDetail(SimpleRabbiMQRequest<String> request){
 

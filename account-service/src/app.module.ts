@@ -7,6 +7,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { MessagingModule } from './messaging/messaging.module';
+import { UserModule } from './user/user.module';
+import { RoleModule } from './role/role.module';
+import { AccessControlService } from './common/security/access-control.service';
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { MessagingModule } from './messaging/messaging.module';
     PrismaModule,
     DatabaseModule,
     MessagingModule,
+    UserModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

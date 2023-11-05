@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +18,13 @@ import java.util.List;
 @Tag(name = "Product")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/products")
+@RequestMapping("products")
 @Slf4j
 public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "Create a product")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse createProduct(@RequestBody CreateProductDto createProductDto){
@@ -30,6 +32,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Import list of products from csv file")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping("/import")
     public ResponseEntity<String> importProductsFromFile(
             @RequestParam("file") MultipartFile file
@@ -43,6 +46,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Get all products (for admin)")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @GetMapping("/admin")
     @ResponseStatus(HttpStatus.OK)
     public List<ProductFullResponse> getAllProducts(){
@@ -91,12 +95,14 @@ public class ProductController {
 
 
     @Operation(summary = "Update a product")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse updateProduct(@RequestBody UpdateProductDto updateProductDto){
         return productService.update(updateProductDto);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PutMapping("/image/{id}")
     public ResponseEntity<ProductResponse> uploadImage(
             @RequestParam("file[]") MultipartFile[] file,
@@ -105,12 +111,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.uploadProductImages(file,id));
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(@PathVariable String id){
         productService.delete(id);
         return ResponseEntity.ok("delete successfully");
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @DeleteMapping
     public ResponseEntity<String> deleteProducts(
             @RequestBody DeleteProductsDto deleteProductsDto,
@@ -126,6 +134,7 @@ public class ProductController {
         return ResponseEntity.ok("delete successfully");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Clear all data include products, categories, brands,...")
     @DeleteMapping("/db")
     public ResponseEntity<String> deleteProducts(){

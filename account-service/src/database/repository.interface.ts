@@ -3,6 +3,6 @@ export interface IRepository<T> {
   findById(id: string): Promise<T>;
   findOne(option: any): Promise<T>;
   findAll(option?: any): Promise<T[]>;
-  update(id: string, dto: Partial<T>): Promise<T>;
+  update(id: string, dto: Partial<T> | any): Promise<T>;
   delete(id: string): Promise<boolean>;
 }

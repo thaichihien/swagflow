@@ -19,6 +19,8 @@ public class RabbitMQConfig {
     public static final String PRODUCT_DETAIL_QUEUE = "product-detail-queue";
     public static final String PRODUCTS_DETAIL_QUEUE = "products-detail-queue";
 
+    public static final String ACCOUNT_QUEUE = "account-queue";
+
     private final CachingConnectionFactory cachingConnectionFactory;
 
     public  RabbitMQConfig(CachingConnectionFactory cachingConnectionFactory){
@@ -64,6 +66,7 @@ public class RabbitMQConfig {
     public RabbitTemplate rabbitTemplate(Jackson2JsonMessageConverter converter){
         RabbitTemplate template = new RabbitTemplate(cachingConnectionFactory);
         template.setMessageConverter(converter);
+
         return template;
     }
 

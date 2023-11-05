@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { RabbitMQResponse } from './dto/rabbitmq-response.dto';
-import { Customer } from '@prisma/client';
+
 import { CustomerProfileFullDto } from 'src/customer/dto/customer-profile-full.dto';
+import { Customer } from 'src/customer/enity/customer.enity';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
 
 @Injectable()
 export class MessagingService {
@@ -10,21 +12,14 @@ export class MessagingService {
 
   async verifyAndGetAccount(
     token: string,
-  ): Promise<RabbitMQResponse<CustomerProfileFullDto>> {
+  ): Promise<RabbitMQResponse<CustomerProfileFullDto | UserResponseDto>> {
     const user = await this.authService.verifyUser(token);
 
     if (user) {
       return {
         success: true,
         message: 'Get account information successfully',
-        data: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          dob: user.dob,
-          phone: user.phone,
-        },
+        data: user,
       };
     } else {
       return {

@@ -34,3 +34,34 @@ model Address {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model User{
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  password     String
+  firstName    String
+  lastName     String
+  refreshToken String?
+  roles         UserRole[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Role{
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  description  String?
+  users         UserRole[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model UserRole{
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
+  roleId       String    @db.Uuid
+  user         User      @relation(fields: [userId], references: [id])
+  role         Role      @relation(fields: [roleId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
