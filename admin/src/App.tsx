@@ -8,6 +8,7 @@ import AddProduct from "./pages/AddProduct"
 import Playground from "./pages/Playground"
 import ImportProducts from "./pages/ImportProducts"
 import Login from "./pages/Login"
+import ProtectedLayout from "./pages/Layout"
 
 function App() {
   return (
@@ -15,22 +16,16 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<ProtectedLayout></ProtectedLayout>}>
             <Route index element={<Dashboard />} />
-            <Route path="/products" element={<ProductList/>}/>
-            <Route path="/add-product" element={<AddProduct/>}/>
-            <Route path="/import" element={<ImportProducts/>}/>
-            <Route path="/playground" element={<Playground/>}/>
-
-            {/* <Route path="/about" element={<About />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/playground" element={<Playground />} /> */}
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/import" element={<ImportProducts />} />
+            <Route path="/playground" element={<Playground />} />
           </Route>
-          <Route path="*" element={<Notfound/>} />
+          <Route path="*" element={<Notfound />} />
         </Routes>
       </BrowserRouter>
-     
     </>
   )
 }

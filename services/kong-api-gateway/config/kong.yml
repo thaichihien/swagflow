@@ -20,7 +20,7 @@ services:
     paths:
     - /auth-service
 - name: account-service
-  url: http://host.docker.internal:3001/api/v1/customer
+  url: http://host.docker.internal:3001/api/v1
   routes:
   - name: account-route
     paths:

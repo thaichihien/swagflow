@@ -11,12 +11,14 @@ import { Link } from "react-router-dom"
 import { Button, ToastContainer } from "react-bootstrap"
 import { serverConfig } from "../config/env"
 import { toast } from "react-toastify"
+import { selectCurrentToken } from "../features/auth/authenticationSlice"
 
 type Props = {}
 
 function ProductList({}: Props) {
   const products = useAppSelector((state) => state.products.data)
   const err = useAppSelector((state) => state.products.error)
+  const token = useAppSelector(selectCurrentToken)
   const dispatch = useAppDispatch()
   let table: BootstrapTable<any, number> | null
 
@@ -59,7 +61,7 @@ function ProductList({}: Props) {
   ]
 
   useEffect(() => {
-    dispatch(fetchProducts())
+    dispatch(fetchProducts(token))
   }, [dispatch])
 
   function handleSelectedProduct(id: string, isRemove: boolean) {

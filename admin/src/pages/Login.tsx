@@ -1,8 +1,41 @@
-import React from "react"
+import React, { useState } from "react"
+import { useLoginMutation } from "../features/auth/authenticationApiSlice"
+import { useAppDispatch } from "../app/hooks"
+import { useLocation, useNavigate } from "react-router-dom"
+import { setCredentials } from "../features/auth/authenticationSlice"
 
 type Props = {}
 
 function Login({}: Props) {
+  const [login, { isLoading }] = useLoginMutation()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || "/"
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+
+  async function handleLogin(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) {
+    event.preventDefault()
+    try {
+      const res = await login({
+        email: email,
+        password: password,
+      }).unwrap()
+      console.log(res)
+
+      dispatch(setCredentials(res))
+      navigate(from, { replace: true })
+    } catch (error: any) {
+      //setErrorMessage(error.data.message)
+      console.log(error)
+    }
+  }
+
   return (
     <>
       <div className="container-scroller">
@@ -14,12 +47,20 @@ function Login({}: Props) {
                   <h3 className="card-title text-left mb-3">Login</h3>
                   <form>
                     <div className="form-group">
-                      <label>Username or email *</label>
-                      <input type="text" className="form-control p_input" />
+                      <label>Email *</label>
+                      <input
+                        type="text"
+                        className="form-control p_input"
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
                     </div>
                     <div className="form-group">
                       <label>Password *</label>
-                      <input type="text" className="form-control p_input" />
+                      <input
+                        type="text"
+                        className="form-control p_input"
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
                     </div>
                     <div className="form-group d-flex align-items-center justify-content-between">
                       <div className="form-check">
@@ -32,22 +73,20 @@ function Login({}: Props) {
                         Forgot password
                       </a>
                     </div>
+                    <div className="form-text mb-3 text-danger">
+                      {errorMessage}
+                    </div>
                     <div className="text-center">
                       <button
                         type="submit"
                         className="btn btn-primary btn-block enter-btn"
+                        onClick={handleLogin}
+                        disabled={isLoading}
                       >
                         Login
                       </button>
                     </div>
-                    <div className="d-flex">
-                      <button className="btn btn-facebook mr-2 col">
-                        <i className="mdi mdi-facebook"></i> Facebook{" "}
-                      </button>
-                      <button className="btn btn-google col">
-                        <i className="mdi mdi-google-plus"></i> Google plus{" "}
-                      </button>
-                    </div>
+
                     <p className="sign-up">
                       Don't have an Account?<a href="#"> Sign Up</a>
                     </p>

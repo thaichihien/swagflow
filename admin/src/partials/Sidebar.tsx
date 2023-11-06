@@ -1,9 +1,12 @@
 import React from "react"
 import { Link } from "react-router-dom"
+import { UserProfile } from "../interfaces/user-profile"
 
-type Props = {}
+type Props = {
+  user: UserProfile | null
+}
 
-function Sidebar({}: Props) {
+function Sidebar({ user }: Props) {
   return (
     <>
       <nav className="sidebar sidebar-offcanvas" id="sidebar">
@@ -32,7 +35,9 @@ function Sidebar({}: Props) {
                   <span className="count bg-success"></span>
                 </div>
                 <div className="profile-name">
-                  <h5 className="mb-0 font-weight-normal">Henry Klein</h5>
+                  <h5 className="mb-0 font-weight-normal">
+                    {user !== null ? `${user.lastName} ${user.firstName}` : ""}
+                  </h5>
                   <span>Gold Member</span>
                 </div>
               </div>
@@ -119,19 +124,13 @@ function Sidebar({}: Props) {
                 </li>
                 <li className="nav-item">
                   {" "}
-                  <Link
-                    className="nav-link"
-                    to="/add-product"
-                  >
+                  <Link className="nav-link" to="/add-product">
                     Add Product
                   </Link>
                 </li>
                 <li className="nav-item">
                   {" "}
-                  <Link
-                    className="nav-link"
-                    to="/import"
-                  >
+                  <Link className="nav-link" to="/import">
                     Import products
                   </Link>
                 </li>

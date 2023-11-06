@@ -35,19 +35,19 @@ const initialState: ResponseWrapper<Product[]> = {
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async () => {
+  async (token : string | null) => {
     try {
-      // let config = {}
+      let config = {}
 
-      // if (token) {
-      //   config = {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   }
-      // }
+      if (token) {
+        config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      }
 
-      const response = await privateAxios.get(`${PRODUCT_SERVICE_PATH}/admin`)
+      const response = await privateAxios.get(`${PRODUCT_SERVICE_PATH}/products/admin`,config)
 
       if (response.status === 200) {
         const resJson = JSON.parse(response.data)
