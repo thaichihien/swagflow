@@ -32,7 +32,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - Database (JPA, Prisma, PostgreSQL, MongoDB)
 - Session and cached (Redis)
 - API Gateway (Kong API)
-- Monitoring và Logging (Prometheus, Grafana, ELK stack (Elasticsearch, Logstash, Kibana)).
+- Monitoring và Logging (ELK stack (Elasticsearch, Logstash, Kibana)).
 - Unit Testing (Jest, JUnit)
 
 ## Main Features
@@ -43,6 +43,17 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - Login / Register an account
 - ...
   
+## Project details:
+
+- **account-service**: a microservice that manages account information and authentication. Teck-stack : **_NestJS, PostgreSQL, Prisma_**
+- **admin**: a front-end application for administration. Teck-stack: _**ReactJS, Redux, Bootstrap**_
+- **cart-service**: a microservice that manages information about cargo. Teck-stack: **_NestJS, MongoDB, Redis_**
+- **client**: a front-end application for end-users (customers). Teck-stack: _**ReactJS, Redux, Bootstrap**_
+- **doc**: documentation related to the entire project.
+- **product-service**: a microservice that manages the system's products. Teck-stack: **_Spring Boot, PostgreSQL_**
+- **services**: other services using Docker, such as RabbitMQ, Redis, Kong API Gateway, and more.
+
+
 ## Roadmap
 
 ### V1
@@ -77,6 +88,7 @@ An e-commerce project about a fictional clothing sales system called SwagFlow. T
 - [ ] Use **Elasticsearch** for searching product
 - [ ] Caching using HTTP Header on **product-service**
 - [ ] Implement OAuth from Google
+- [ ] Set up order-service
 
 ## Run a project locally
 
