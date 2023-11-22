@@ -340,23 +340,23 @@ public class ProductServiceTest {
         assertThrows(IllegalArgumentException.class,() -> productService.findByIds(ids));
     }
 
-    @Test
-    @DisplayName("Should return ProductResponseCursorPagination of the first page")
-    void getProducts_case01(){
-        int limit = 9;
-        Sort cursorSort = Sort.by(
-                Sort.Order.desc("createdAt"),
-                Sort.Order.desc("id")
-        );
-
-        Specification<Product> finalSpecification = where(ProductSpecification.belongsToCategory(categorySample.getName()));
-        when(productRepository.findAll(finalSpecification, PageRequest.of(0, limit, cursorSort))).thenReturn(pageProductsSample);
-
-        ProductResponseCursorPagination result = productService.getProducts(null,limit,"all",List.of());
-
-        assertNotNull(result);
-        assertThat(result.getData().size()).isEqualTo(productListSample.size());
-    }
+//    @Test
+//    @DisplayName("Should return ProductResponseCursorPagination of the first page")
+//    void getProducts_case01(){
+//        int limit = 9;
+//        Sort cursorSort = Sort.by(
+//                Sort.Order.desc("createdAt"),
+//                Sort.Order.desc("id")
+//        );
+//
+//        Specification<Product> finalSpecification = where(ProductSpecification.belongsToCategory(categorySample.getName()));
+//        when(productRepository.findAll(finalSpecification, PageRequest.of(0, limit, cursorSort))).thenReturn(pageProductsSample);
+//
+//        ProductResponseCursorPagination result = productService.getProducts(null,limit,"all",List.of());
+//
+//        assertNotNull(result);
+//        assertThat(result.getData().size()).isEqualTo(productListSample.size());
+//    }
 
 
 

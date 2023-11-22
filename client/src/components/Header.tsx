@@ -9,8 +9,11 @@ import {
   selectCurrentUser,
   setProfile,
 } from "../features/auth/authenticationSlice"
-import { useProfileMutation } from "../features/auth/authenticationApiSlice"
+import { useLogoutMutation, useProfileMutation } from "../features/auth/authenticationApiSlice"
 import { getCart, selectCart } from "../features/cart/cartSlice"
+import Cookies from "js-cookie"
+
+//let callProfile = false
 
 function Header() {
   const [searching, setSearching] = useState(false)
@@ -19,18 +22,25 @@ function Header() {
   const token = useAppSelector(selectCurrentToken)
   const profile = useAppSelector(selectCurrentUser)
   console.log(`token : ${token}`)
+
   const dispatch = useAppDispatch()
   const [getProfile] = useProfileMutation()
+  const [sendLogOut] = useLogoutMutation();
 
   useEffect(() => {
-    if (token && !profile) {
+    if (!profile) {
       // call "customer/profile"
       getProfile()
         .unwrap()
-        .then((res) => {
+        .then((res: any) => {
           console.log(res)
           dispatch(setProfile(res))
         })
+        .catch((err: any) => {
+          console.log(err);
+        })
+
+      //callProfile = true
     }
 
     dispatch(getCart(token))
@@ -42,7 +52,14 @@ function Header() {
   }
 
   function handleLogOut(): void {
-    dispatch(logOut())
+    sendLogOut()
+      .unwrap()
+      .then((res: any) => {
+        dispatch(logOut())
+      })
+      .catch((err: any) => {
+        console.log(err)
+      })
   }
 
   return (
@@ -214,7 +231,9 @@ function Header() {
                 <li>
                   <Link className="header-icon" to="/cart">
                     <BsCart2 className="fs-4" />
-                    <span className="badge badge-warning lblCartCount">{cartResponse.cart.totalQuantity}</span>
+                    <span className="badge badge-warning lblCartCount">
+                      {cartResponse.cart.totalQuantity}
+                    </span>
                   </Link>
                 </li>
               </ul>

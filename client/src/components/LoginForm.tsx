@@ -27,7 +27,7 @@ function LoginForm({}: Props) {
       const res = await login({
         email: email,
         password: password,
-      }).unwrap()
+      })
 
       dispatch(setCredentials(res))
       navigate(from, { replace: true })

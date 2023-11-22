@@ -20,6 +20,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CookieInterceptor } from 'src/common/interceptors/cookie.interceptor';
 import { CookieTokenGuard } from 'src/common/guards/cookie-token.guard';
 import { UserParam } from './dto/user-param.dto';
+import { ClearCookieInterceptor } from 'src/common/interceptors/clear-cookie.interceptor';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -92,6 +93,7 @@ export class AuthController {
   }
 
   @Get('/:user/log-out')
+  @UseInterceptors(ClearCookieInterceptor)
   @UseGuards(AccessTokenGuard)
   async logOutUser(@Param() param: UserParam, @Req() req: Request) {
     const id = req.user['sub'];

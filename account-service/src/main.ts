@@ -24,7 +24,11 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser())
-  app.enableCors()
+  app.enableCors({
+    allowedHeaders: ['content-type','authorization'],
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
   await app.listen(PORT);
   console.log(`listening at http://localhost:${PORT}`);
 }

@@ -42,7 +42,7 @@ public class JwtAdminValidateFilter extends OncePerRequestFilter {
 
         final String token = extractJwtFromHeaderBearer(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-        log.info(token);
+        //log.info(token);
         UserResponse userResponse = validateJwtAdmin(token);
 
         if(userResponse != null){
@@ -85,7 +85,7 @@ public class JwtAdminValidateFilter extends OncePerRequestFilter {
 
 
     private String extractJwtFromHeaderBearer(String header) {
-        log.info(header);
+        //log.info(header);
         if (header == null || !header.startsWith("Bearer")) {
             return null;
         }

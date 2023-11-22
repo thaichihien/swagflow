@@ -195,29 +195,24 @@ export class AuthService {
     id: string,
     refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    // - check exits and refresh token
-
     const existedUser = await this.userService.findById(id);
 
     if (!existedUser || !existedUser.refreshToken) {
       throw new ForbiddenException('Access denied');
     }
 
-    // - verify refresh token
     if (!(await this.verifyPassword(refreshToken, existedUser.refreshToken))) {
       throw new ForbiddenException('Access denied');
     }
 
     const roles = await this.userService.findUserRole(existedUser.id);
 
-    // - generate tokens
     const tokens = await this.generateTokens(
       existedUser.id,
       existedUser.email,
       roles,
     );
 
-    // - update refresh tokens
     await this.updateUserRefreshToken(existedUser.id, tokens.refreshToken);
     return tokens;
   }
@@ -279,7 +274,7 @@ export class AuthService {
   }
 
   async verifyUser(
-    token: string
+    token: string,
   ): Promise<CustomerProfileFullDto | UserResponseDto | null> {
     try {
       const payload: JwtPayLoad = await this.jwtService.verifyAsync(token, {

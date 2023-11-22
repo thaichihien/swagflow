@@ -1,6 +1,7 @@
 import { apiSlice } from "../../api/apiSlice"
 import { ACCOUNT_SERVICE_PATH, AUTH_SERVICE_PATH } from "../../config/apiRoute"
 import { CustomerProfile } from "../../interfaces/customer-profile"
+import Cookies from 'js-cookie'
 
 export interface LoginDto {
   email: string
@@ -37,10 +38,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: `${ACCOUNT_SERVICE_PATH}/profile`,
         method: "GET",
+        
+      }),
+    }),
+    logout: builder.mutation<unknown,void>({
+      query: () => ({
+        url: `${AUTH_SERVICE_PATH}/log-out`,
+        method: "GET",
       }),
     }),
    
   }),
 })
 
-export const { useLoginMutation, useRegisterMutation,useProfileMutation } = authApiSlice
+export const { useLoginMutation, useRegisterMutation,useProfileMutation,useLogoutMutation } = authApiSlice
