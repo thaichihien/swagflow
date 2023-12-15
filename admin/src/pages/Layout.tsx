@@ -6,7 +6,8 @@ import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import { useAppDispatch, useAppSelector } from "../app/hooks"
 import { selectAuth, setProfile } from "../features/auth/authenticationSlice"
-import { useProfileMutation } from "../features/auth/authenticationApiSlice"
+import { useProfileQuery } from "../features/auth/authenticationApiSlice"
+
 
 type Props = {
 }
@@ -14,23 +15,42 @@ type Props = {
 function ProtectedLayout({  }: Props) {
   const user = useAppSelector(selectAuth)
   const dispatch = useAppDispatch()
-  const [getProfile] = useProfileMutation()
+  const { data, isLoading, isError,isSuccess } = useProfileQuery(
+    {},
+    
+  )
   let location = useLocation()
+
+  useEffect(() => {
+    // if (user.token && !user.user) {
+    //   getProfile()
+    //     .unwrap()
+    //     .then((res) => {
+    //       //console.log(res)
+    //       dispatch(setProfile(res))
+    //     })
+    // }
+
+   
+
+    if (data) {
+     
+      dispatch(setProfile(data))
+    }
+  }, [data])
+
+
+  if(isLoading){
+    return <h1>Loading...</h1>
+  }
+
+ 
 
   if (!user.isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  useEffect(() => {
-    if (user.token && !user.user) {
-      getProfile()
-        .unwrap()
-        .then((res) => {
-          //console.log(res)
-          dispatch(setProfile(res))
-        })
-    }
-  }, [])
+  
 
   return (
     <>

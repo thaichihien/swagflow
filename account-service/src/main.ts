@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 
 const PORT = process.env.PORT || 3000;
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,9 +25,10 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser())
+  console.log(ALLOWED_ORIGINS);
   app.enableCors({
     allowedHeaders: ['content-type','authorization'],
-    origin: 'http://localhost:5173',
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   })
   await app.listen(PORT);

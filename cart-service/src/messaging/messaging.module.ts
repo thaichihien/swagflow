@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports : [
-    RabbitMQModule.forRootAsync(RabbitMQModule, {
+    RabbitMQModule.forRootAsync(RabbitMQModule, { 
       imports : [ConfigModule],
       inject : [ConfigService],
       useFactory: async (configService : ConfigService) => {
@@ -25,6 +25,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
               }
             ],
             uri: `amqp://${user}:${password}@${host}`, 
+            connectionManagerOptions : {
+              connectionOptions : {
+                timeout : 10000
+              }
+            },
+            //enableControllerDiscovery : true,
             //connectionInitOptions: { wait: false },
           }
 

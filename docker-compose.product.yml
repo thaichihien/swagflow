@@ -1,0 +1,48 @@
+version: '3.0'
+
+services:
+  product-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=swagflow-product
+    ports:
+      - '5402:5432'
+    networks:
+      - swagflow-network
+    volumes: 
+      - product-db:/var/lib/postgresql/data
+  rabbitmq:
+    container_name: rabbitmq-swagflow
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - swagflow-network
+  product-service:
+    container_name: product-service
+    depends_on:
+      - product-database
+      - rabbitmq
+    build: ./product-service
+    ports:
+      - '3002:3002'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://product-database:5432/swagflow-product
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - swagflow-network
+  
+
+networks:
+  swagflow-network:
+    driver: bridge
+
+volumes:
+  product-db:
+    driver: local

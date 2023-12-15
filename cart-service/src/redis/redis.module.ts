@@ -12,7 +12,7 @@ export const REDIS_SERVICE = 'REDIS';
       inject: [ConfigService],
       provide: REDIS_SERVICE,
       useFactory: async (configService: ConfigService) => {
-        const username = configService.get('REDIS_USERNAME');
+        //const username = configService.get('REDIS_USERNAME');
         const password = configService.get('REDIS_PASSWORD');
         const redisUrl = configService.get('REDIS_URL');
 

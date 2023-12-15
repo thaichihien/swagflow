@@ -1,0 +1,118 @@
+version: '3.0'
+
+services:
+  product-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=swagflow-product
+    ports:
+      - '5402:5432'
+    networks:
+      - swagflow-network
+    volumes: 
+      - product-db:/var/lib/postgresql/data
+  account-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5401:5432'
+    networks:
+      - swagflow-network
+    volumes: 
+      - account-db:/var/lib/postgresql/data
+  rabbitmq:
+    container_name: rabbitmq-swagflow
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - swagflow-network
+  product-service:
+    container_name: product-service
+    depends_on:
+      - product-database
+      - rabbitmq
+    build: ./product-service
+    ports:
+      - '3002:3002'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://product-database:5432/swagflow-product
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SERVICES_CORS_ALLOWED_ORIGINS=http://localhost:5000
+    networks:
+      - swagflow-network
+  account-service:
+    depends_on:
+      - rabbitmq
+      - account-database
+    build: ./account-service
+    ports:
+      - '3001:3001'
+    environment:
+      - HOST=account-database
+      - DB_PORT=5432
+      - DB_NAME=swagflow-account
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=rabbitmq:5672
+      - ALLOWED_ORIGINS=http://localhost:5000
+    networks:
+      - swagflow-network
+  admin:
+    build: ./admin
+    ports:
+      - '5000:80'
+    depends_on:
+      - kong
+    environment:
+      - VITE_SERVICE_HOST=http://kong:8000
+    networks:
+      - swagflow-network
+  
+  kong:
+    image: kong
+    container_name: api-gateway
+    depends_on:
+      - product-service
+      - account-service
+    volumes:
+      - "./services/kong-api-gateway/config:/usr/local/kong/declarative"
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+      - KONG_LOG_LEVEL=debug
+      - KONG_PLUGINS=bundled
+    ports:
+      - "8000:8000/tcp"
+      - "127.0.0.1:7990:8001/tcp"
+      - "8002:8001/tcp"
+      - "8443:8443/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+    networks:
+      - swagflow-network
+  
+  
+
+networks:
+  swagflow-network:
+    driver: bridge
+
+volumes:
+  product-db:
+    driver: local
+  account-db:
+    driver: local

@@ -118,7 +118,7 @@ function Sidebar({ user }: Props) {
               <ul className="nav flex-column sub-menu">
                 <li className="nav-item">
                   {" "}
-                  <Link className="nav-link" to="/products" reloadDocument>
+                  <Link className="nav-link" to="/products">
                     Product List
                   </Link>
                 </li>

@@ -20,7 +20,7 @@ function ProductList({}: Props) {
   const err = useAppSelector((state) => state.products.error)
   const token = useAppSelector(selectCurrentToken)
   const dispatch = useAppDispatch()
-  let table: BootstrapTable<any, number> | null
+  
 
   const [selectedItems, setSelectedItems] = useState<string[]>([])
 

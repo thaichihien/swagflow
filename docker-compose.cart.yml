@@ -1,0 +1,61 @@
+version: '3.0'
+
+services:
+  cart-database:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - cart-db:/data/db
+    networks:
+      - swagflow-network
+  redis:
+    image: redis/redis-stack:latest
+    container_name: session-redis
+    restart: unless-stopped
+    environment:
+      REDIS_ARGS: "--requirepass 123456"
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - session-data:/data
+    networks:
+      - swagflow-network
+  rabbitmq:
+    container_name: rabbitmq-swagflow
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - swagflow-network
+  cart-service:
+    depends_on:
+      - redis
+      - rabbitmq
+      - cart-database
+    build: ./cart-service
+    restart: on-failure
+    ports:
+      - '3003:3003'
+    environment:
+      - DB_URI=mongodb://cart-database:27017/cart-service
+      - REDIS_PASSWORD=123456
+      - REDIS_URL=redis:6379
+      - RABBITMQ_HOST=rabbitmq:5672
+    networks:
+      - swagflow-network
+
+networks:
+  swagflow-network:
+    driver: bridge
+
+volumes:
+  cart-db:
+    driver: local
+  session-data:
+    driver: local
+    

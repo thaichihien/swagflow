@@ -6,13 +6,18 @@ import {
   import { RootState } from "../app/store"
   import { BaseQueryApi } from "@reduxjs/toolkit/dist/query/baseQueryTypes"
   import { logOut, setCredentials } from "../features/auth/authenticationSlice"
+import { AUTH_SERVICE_PATH } from "../config/apiRoute"
   
   const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVICE_HOST,
+    credentials: "include",
     prepareHeaders: (headers: Headers, { getState }) => {
       const token = (getState() as RootState).auth.token
+
+      
+
       if (token) {
-        console.log("Set token");
+      
         headers.set("Authorization", `Bearer ${token}`)
       }
   
@@ -26,25 +31,30 @@ import {
     extraOptions: {},
   ) => {
     let result = await baseQuery(args, api, extraOptions)
-  
-    if (result?.error?.status === 403) {
-      console.log("sending refresh token")
-      // send refresh token to get new access token
-      const refreshResult = await baseQuery("/refresh", api, extraOptions)
-      console.log(refreshResult)
-      if (refreshResult?.data) {
-        const user = (api.getState() as RootState).auth.user
-        // store the new token
-        //const token = refreshResult.data
-        api.dispatch(setCredentials({ ...refreshResult.data, user }))
-        // retry the original query with new access token
-        result = await baseQuery(args, api, extraOptions)
-      } else {
-        api.dispatch(logOut())
-      }
+
+  if (result?.error?.status === "FETCH_ERROR") {
+    console.log("sending refresh token")
+
+    // send refresh token to get new access token
+    const refreshResult = await baseQuery(
+      `${AUTH_SERVICE_PATH}/refresh`,
+      api,
+      extraOptions,
+    )
+   
+    if (refreshResult?.data) {
+      // store the new token
+      //const token = refreshResult.data
+
+      api.dispatch(setCredentials(refreshResult.data))
+      // retry the original query with new access token
+      result = await baseQuery(args, api, extraOptions)
+    } else {
+      api.dispatch(logOut())
     }
-  
-    return result
+  }
+
+  return result
   }
   
   export const apiSlice = createApi({

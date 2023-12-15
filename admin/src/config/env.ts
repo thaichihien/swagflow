@@ -1,5 +1,5 @@
 class Server {
-  readonly host: string = import.meta.env.VITE_SERVER_HOST
+  readonly host: string = import.meta.env.VITE_SERVICE_HOST
 
 
   endpoint(path: string) {

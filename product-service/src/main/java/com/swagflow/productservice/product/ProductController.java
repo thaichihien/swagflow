@@ -23,6 +23,12 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
+    @Operation(summary = "Just for check service")
+    @GetMapping("/check")
+    public ResponseEntity<String> check(){
+        return ResponseEntity.ok("product-service is working");
+    }
+
     @Operation(summary = "Create a product")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping

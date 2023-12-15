@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const PORT = process.env.PORT;
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(',');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,9 +17,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  console.log(ALLOWED_ORIGINS);
   app.enableCors({
     allowedHeaders: ['content-type','authorization'],
-    origin: 'http://localhost:5173',
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   });
   await app.listen(PORT);

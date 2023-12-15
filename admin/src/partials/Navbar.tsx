@@ -1,8 +1,26 @@
 import React from 'react'
+import { useLogoutMutation } from '../features/auth/authenticationApiSlice'
+import { useAppDispatch } from '../app/hooks'
+import { logOut } from '../features/auth/authenticationSlice'
 
 type Props = {}
 
 function Navbar({}: Props) {
+
+  const [logout,{isLoading}] = useLogoutMutation()
+  const dispatch = useAppDispatch()
+
+
+  function handleLogout(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void {
+    if(!isLoading){
+      logout().then(() => {
+        dispatch(logOut())
+      })
+    }
+
+
+  }
+
   return (
    <>
     <nav className="navbar p-0 fixed-top d-flex flex-row">
@@ -183,7 +201,7 @@ function Navbar({}: Props) {
                         <i className="mdi mdi-logout text-danger"></i>
                       </div>
                     </div>
-                    <div className="preview-item-content">
+                    <div className="preview-item-content" onClick={handleLogout}>
                       <p className="preview-subject mb-1">Log out</p>
                     </div>
                   </a>

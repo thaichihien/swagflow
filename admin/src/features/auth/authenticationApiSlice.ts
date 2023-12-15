@@ -34,14 +34,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: credentials,
       }),
     }),
-    profile: builder.mutation<UserProfile, void>({
+    profile: builder.query({
       query: () => ({
         url: `${ACCOUNT_SERVICE_PATH}/profile`,
         method: "GET",
       }),
     }),
-   
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: `${AUTH_SERVICE_PATH}/log-out`,
+        method: "GET",
+      }),
+    }),
+
+
   }),
 })
 
-export const { useLoginMutation, useRegisterMutation,useProfileMutation } = authApiSlice
+export const { useLoginMutation, useRegisterMutation,useProfileQuery,useLogoutMutation } = authApiSlice

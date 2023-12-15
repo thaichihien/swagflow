@@ -1,0 +1,48 @@
+version: '3.0'
+
+services:
+  account-database:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5401:5432'
+    networks:
+      - swagflow-network
+    volumes: 
+      - account-db:/var/lib/postgresql/data
+  rabbitmq:
+    container_name: rabbitmq-swagflow
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - swagflow-network
+  account-service:
+    depends_on:
+      - rabbitmq
+      - account-database
+    build: ./account-service
+    ports:
+      - '3001:3001'
+    environment:
+      - HOST=account-database
+      - DB_PORT=5432
+      - DB_NAME=swagflow-account
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=rabbitmq:5672
+    networks:
+      - swagflow-network
+
+networks:
+  swagflow-network:
+    driver: bridge
+
+volumes:
+  account-db:
+    driver: local
+    

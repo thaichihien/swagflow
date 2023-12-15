@@ -10,6 +10,8 @@ services:
       key: df7a42601487b2a866a68765d07d9ec2
   rabbitmq:
     exchange-name: swagflow
+  cors:
+    allow-origins: http://localhost:5173
 
 spring:
   datasource:
