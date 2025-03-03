@@ -27,6 +27,7 @@ export class CustomerController {
   private logger : Logger = new Logger(CustomerController.name)
 
 
+  @UseGuards(AccessTokenGuard)
   @Get('/profile')
   getProfile(@Req() req: Request): Promise<CustomerProfileDto> {
     const id = req.user['sub'];

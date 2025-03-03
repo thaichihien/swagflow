@@ -498,6 +498,9 @@ public class ProductServiceImpl implements ProductService {
         SpecificationBuilder<Product> specificationBuilder = new SpecificationBuilder<>();
         Specification<Product> finalSpecification = null;
 
+        if(category != null && category.equals("all")){
+            category = null;
+        }
 
         specificationBuilder.addAndIfExist(category != null && !category.isEmpty(), ProductSpecification.belongsToCategory(category))
                 .addAndIfExist(brands != null && !brands.isEmpty(), ProductSpecification.inTheseBrand(brands))

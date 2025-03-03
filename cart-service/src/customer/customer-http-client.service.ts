@@ -7,15 +7,23 @@ export class CustomerHttpClientService extends CustomerService {
   async getCustomerFromToken(token: string): Promise<CustomerProfileFullDto> {
     try {
       const rawResponse = await fetch(
-        `http://localhost:3002/api/v1/products?${"queryParam"}`,
+        `http://localhost:3001/api/v1/customers/profile`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
-
-      if (!rawResponse.ok) {
-      }
 
       const response: CustomerProfileFullDto = await rawResponse.json();
 
-      return response
+      if (!rawResponse.ok) {
+        return null;
+      }
+
+      return response;
     } catch (error) {
       console.log(error);
     }

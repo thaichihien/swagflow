@@ -41,10 +41,10 @@ jwt_secrets:
   key: swagflow-key
   secret: swagflow-access
 
-plugins:
-- name: tcp-log
-  config:
-    host: logstash
-    port: 5000
+# plugins:
+# - name: tcp-log
+#   config:
+#     host: logstash
+#     port: 5000
 
 

@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Import list of products from csv file")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
+    //@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping("/import")
     public ResponseEntity<String> importProductsFromFile(
             @RequestParam("file") MultipartFile file
