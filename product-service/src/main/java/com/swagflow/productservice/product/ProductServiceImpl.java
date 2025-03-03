@@ -432,7 +432,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseOffsetPagination getProducts(int page, int limit) {
-        return getProducts(page, limit, Sort.by("updated_at").descending());
+        return getProducts(page, limit, Sort.by("updatedAt").descending());
     }
 
     @Override

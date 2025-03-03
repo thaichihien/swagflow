@@ -23,7 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
     CartModule,
     DatabaseModule,
     RedisModule,
-    MessagingModule,
+    //MessagingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

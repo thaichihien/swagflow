@@ -10,19 +10,12 @@ export const mainConfig: MainConfig = {
     route: 'api',
     config(config) {
       return config
-        .setTitle('Account Service')
-        .setDescription(
-          'A microservice that manages account information and authentication',
-        )
-        .setVersion('v1')
-        .addTag(
-          'Customer',
-          'Manages customer information and authentication (Not Finished)',
-        )
-        .addTag('User', 'Manages user (admin) information and authentication');
+        .setTitle('Cart Service')
+        .setDescription('A microservice that manages information about cargo')
+        .setVersion('v1');
     },
   },
-  globalPrefix: 'api/v1',
+  //globalPrefix: 'api/v1',
   corsOptions: {
     allowedHeaders: ['content-type', 'authorization'],
     origin: ALLOWED_ORIGINS,

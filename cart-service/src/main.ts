@@ -1,25 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { configIfExist } from './common/helpers/config';
+import { mainConfig } from './main.config';
 
 const PORT = process.env.PORT;
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(',');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  //app.setGlobalPrefix('/api/v1')
-  const config = new DocumentBuilder()
-    .setTitle('Cart Service')
-    .setDescription('API description')
-    .setVersion('0.1')
-    .build();
+  configIfExist(mainConfig.globalPrefix, (prefix) =>
+    app.setGlobalPrefix(prefix),
+  );
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  configIfExist(mainConfig.swaggerConfig, (config) => {
+    if (config.enable) {
+      const documentBuilder = config.config(new DocumentBuilder()).build();
+      const document = SwaggerModule.createDocument(app, documentBuilder);
+      SwaggerModule.setup(config.route, app, document, config.options);
+    }
+  });
 
   console.log(ALLOWED_ORIGINS);
   app.enableCors({
-    allowedHeaders: ['content-type','authorization'],
+    allowedHeaders: ['content-type', 'authorization'],
     origin: ALLOWED_ORIGINS,
     credentials: true,
   });

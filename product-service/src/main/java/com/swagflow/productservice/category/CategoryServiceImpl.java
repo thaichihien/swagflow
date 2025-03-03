@@ -31,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService{
                 .name(createCategoryDto.getName())
                 .build();
         categoryRepository.save(created);
+
         return created;
     }
 

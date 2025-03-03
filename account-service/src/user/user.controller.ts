@@ -19,7 +19,9 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { HasRoles } from 'src/common/decorators/has-roles.decorator';
 import { Role } from 'src/common/constants/role.enum';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("User")
 @Controller('users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
