@@ -4,9 +4,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { configIfExist } from './common/helpers/config';
 import { mainConfig } from './main.config';
 
-const PORT = process.env.PORT;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS.split(',');
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   configIfExist(mainConfig.globalPrefix, (prefix) =>
@@ -21,13 +18,13 @@ async function bootstrap() {
     }
   });
 
-  console.log(ALLOWED_ORIGINS);
-  app.enableCors({
-    allowedHeaders: ['content-type', 'authorization'],
-    origin: ALLOWED_ORIGINS,
-    credentials: true,
+  configIfExist(mainConfig.corsOptions, (corsOptions) => {
+    app.enableCors(corsOptions);
+    console.log(
+      `Api documentation is available at http://localhost:${mainConfig.port}/api`,
+    );
   });
-  await app.listen(PORT);
-  console.log(`listening at http://localhost:${PORT}`);
+  await app.listen(mainConfig.port);
+  console.log(`listening at http://localhost:${mainConfig.port}`);
 }
 bootstrap();

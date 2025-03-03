@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ProductSpecification {
 
@@ -21,6 +22,16 @@ public class ProductSpecification {
         return (root, query, criteriaBuilder) -> {
             Join<Product, Brand> brandJoin = root.join("brand");
             return brandJoin.get("name").in(brands);
+        };
+    }
+
+    static public Specification<Product> hasIds(List<String> ids){
+        return (root, query, criteriaBuilder) -> {
+            List<UUID> uuidList = ids.stream()
+                    .map(UUID::fromString)  // Convert String to UUID
+                    .toList();
+
+            return root.get("id").in(uuidList);
         };
     }
 

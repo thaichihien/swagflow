@@ -11,6 +11,8 @@ import { REDIS_SERVICE, RedisModule } from './redis/redis.module';
 import { MessagingModule } from './messaging/messaging.module';
 import * as session from 'express-session';
 import { JwtModule } from '@nestjs/jwt';
+import { ProductModule } from './product/product.module';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { JwtModule } from '@nestjs/jwt';
     CartModule,
     DatabaseModule,
     RedisModule,
+    ProductModule,
+    CustomerModule,
     //MessagingModule,
   ],
   controllers: [AppController],

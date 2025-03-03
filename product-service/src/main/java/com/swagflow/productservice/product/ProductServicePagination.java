@@ -13,7 +13,7 @@ public interface ProductServicePagination {
 
     ProductResponseCursorPagination getProducts(String nextCursor,int limit);
 
-    ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category, List<String> brands);
+    ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category, List<String> brands,List<String> ids);
 
 
 }

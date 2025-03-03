@@ -1,7 +1,7 @@
 import { MainConfig } from './main.config.type';
 
 const PORT = process.env.PORT || 3000;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || ['*'];
 
 export const mainConfig: MainConfig = {
   port: PORT,

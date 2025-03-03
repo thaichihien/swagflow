@@ -18,6 +18,7 @@ import com.swagflow.productservice.size.Size;
 import com.swagflow.productservice.size.SizeService;
 import com.swagflow.productservice.utils.CSVService;
 import com.swagflow.productservice.utils.Constants;
+import com.swagflow.productservice.utils.SpecificationBuilder;
 import com.swagflow.productservice.utils.pagination.PageSpecification;
 import com.swagflow.productservice.utils.pagination.PaginationCursor;
 import com.swagflow.productservice.utils.pagination.PaginationCursorEncoderDecoder;
@@ -197,14 +198,14 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> findByIds(List<String> ids) {
         List<UUID> uuids = new LinkedList<>();
-        for(String id : ids){
+        for (String id : ids) {
             UUID uuid = ExceptionHelper.UUID.fromStringOrElseThrow(id, ExceptionHelper.ServerErrorMessage.INVALID_ID);
             uuids.add(uuid);
         }
 
-        List<Product> products= productRepository.getProduct().findAllById(uuids);
+        List<Product> products = productRepository.getProduct().findAllById(uuids);
         List<ProductResponse> responses = new LinkedList<>();
-        for(Product product : products){
+        for (Product product : products) {
             List<String> imgUrls = product.getImages().stream().map(ProductImage::getUrl).toList();
             ProductResponse res = ProductResponse.builder()
                     .id(product.getId())
@@ -217,7 +218,7 @@ public class ProductServiceImpl implements ProductService {
                     .build();
             responses.add(res);
         }
-        return  responses;
+        return responses;
     }
 
     @Override
@@ -484,7 +485,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category,List<String> brands) {
+    public ProductResponseCursorPagination getProducts(String nextCursor, int limit, String category, List<String> brands, List<String> ids) {
 
         // default sort by id and createdAt (for cursor pagination)
         Sort cursorSort = Sort.by(
@@ -492,37 +493,20 @@ public class ProductServiceImpl implements ProductService {
                 Sort.Order.desc("id")
         );
         Slice<Product> products;
-        boolean isQueryCategory = !category.equals("all");
-        boolean isQueryBrands = brands != null && !brands.isEmpty();
 
+
+        SpecificationBuilder<Product> specificationBuilder = new SpecificationBuilder<>();
         Specification<Product> finalSpecification = null;
 
-        if(isQueryCategory){
-            finalSpecification = where(ProductSpecification.belongsToCategory(category));
-        }
 
+        specificationBuilder.addAndIfExist(category != null && !category.isEmpty(), ProductSpecification.belongsToCategory(category))
+                .addAndIfExist(brands != null && !brands.isEmpty(), ProductSpecification.inTheseBrand(brands))
+                .addAndIfExist(ids != null && !ids.isEmpty(), ProductSpecification.hasIds(ids));
 
-        if(isQueryBrands){
-            if(isQueryCategory){
-                finalSpecification = finalSpecification.and(ProductSpecification.inTheseBrand(brands));
-            }else{
-                finalSpecification = where(ProductSpecification.inTheseBrand(brands));
-            }
-        }
-
+        finalSpecification = specificationBuilder.build();
 
         // nextCursor == null meaning this is the first page
-        if (nextCursor == null) {
-
-            if(isQueryBrands || isQueryCategory){
-                products = productRepository.getProduct().findAll(finalSpecification,
-                        PageRequest.of(0, limit, cursorSort));
-            }else{
-                products = productRepository.getProduct().findAll(
-                        PageRequest.of(0, limit, cursorSort));
-            }
-
-        } else {
+        if (nextCursor != null) {
             // Get createdAt and id from nextCursor string
             PaginationCursor paginationCursor = PaginationCursorEncoderDecoder.decode(nextCursor);
 
@@ -532,14 +516,10 @@ public class ProductServiceImpl implements ProductService {
                     paginationCursor.getId()
             );
 
-            if(isQueryCategory | isQueryBrands){
-                finalSpecification= finalSpecification.and(cursorSpecification);
-                products = productRepository.getProduct().findAll(finalSpecification, PageRequest.of(0, limit, cursorSort));
-            }else {
-                products = productRepository.getProduct().findAll(cursorSpecification, PageRequest.of(0, limit, cursorSort));
-            }
-
+            finalSpecification = finalSpecification.and(cursorSpecification);
         }
+
+        products = productRepository.getProduct().findAll(finalSpecification, PageRequest.of(0, limit, cursorSort));
 
 
         if (!products.hasContent()) {
@@ -550,7 +530,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> data = products.getContent();
         String nextCursorKey = null;
-        if(products.hasNext()){
+        if (products.hasNext()) {
             nextCursorKey = PaginationCursorEncoderDecoder.encode(
                     new PaginationCursor(
                             data.get(data.size() - 1).getCreatedAt(),
