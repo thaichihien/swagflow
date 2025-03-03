@@ -21,7 +21,7 @@ import { AccessControlService } from './common/security/access-control.service';
     AuthModule,
     PrismaModule,
     DatabaseModule,
-    MessagingModule,
+    //MessagingModule,
     UserModule,
     RoleModule,
   ],
