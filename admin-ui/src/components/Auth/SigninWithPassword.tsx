@@ -4,6 +4,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 import InputGroup from "../FormElements/InputGroup";
 import { Checkbox } from "../FormElements/checkbox";
+import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function SigninWithPassword() {
   const [data, setData] = useState({
@@ -11,7 +13,8 @@ export default function SigninWithPassword() {
     password: process.env.NEXT_PUBLIC_DEMO_USER_PASS || "",
     remember: false,
   });
-
+  const router = useRouter();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,25 +24,32 @@ export default function SigninWithPassword() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    try {
+      // You can remove this code block
+      setLoading(true);
 
-    // You can remove this code block
-    setLoading(true);
-
-    setTimeout(() => {
+      await login({
+        email: data.email,
+        password: data.password,
+      });
       setLoading(false);
-    }, 1000);
+
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <InputGroup
         type="email"
         label="Email"
         className="mb-4 [&_input]:py-[15px]"
         placeholder="Enter your email"
         name="email"
+        required
         handleChange={handleChange}
         value={data.email}
         icon={<EmailIcon />}
@@ -51,6 +61,7 @@ export default function SigninWithPassword() {
         className="mb-5 [&_input]:py-[15px]"
         placeholder="Enter your password"
         name="password"
+        required
         handleChange={handleChange}
         value={data.password}
         icon={<PasswordIcon />}
@@ -72,7 +83,7 @@ export default function SigninWithPassword() {
         />
 
         <Link
-          href="/auth/forgot-password"
+          href="/test"
           className="hover:text-primary dark:text-white dark:hover:text-primary"
         >
           Forgot Password?
@@ -81,7 +92,8 @@ export default function SigninWithPassword() {
 
       <div className="mb-4.5">
         <button
-          type="submit"
+          type="button"
+          onClick={handleSubmit}
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
         >
           Sign In
@@ -90,6 +102,6 @@ export default function SigninWithPassword() {
           )}
         </button>
       </div>
-    </form>
+    </div>
   );
 }

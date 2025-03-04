@@ -14,6 +14,8 @@ import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
 import { usePathname } from "next/navigation";
+import LayoutWrapper from "@/components/LayoutWrapper";
+import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 const satisfy = Satisfy({ subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
@@ -34,10 +36,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body>
         <Providers>
           <NextTopLoader showSpinner={false} />
+          <ProtectedRoute>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </ProtectedRoute>
 
-          
-
-          <div className="flex min-h-screen">
+          {/* <div className="flex min-h-screen">
             <Sidebar />
 
             <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
@@ -47,7 +50,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
                 {children}
               </main>
             </div>
-          </div>
+          </div> */}
         </Providers>
       </body>
     </html>

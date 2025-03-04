@@ -1,7 +1,9 @@
+import { refreshAccessToken } from "@/context/auth-context";
 import axios from "axios";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,7 +22,7 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => response, // Return data if successful
-  (error) => {
+  async (error) => {
     if (error.response) {
       console.error("API Error:", error.response.data.message || error.message);
     } else {
@@ -31,14 +33,12 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-    //   const newAccessToken = await refreshAccessToken();
+      const newAccessToken = await refreshAccessToken();
 
-    //   if (newAccessToken) {
-    //     api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
-    //     return api(originalRequest);
-    //   }
-
-      //logout();
+      if (newAccessToken) {
+        apiClient.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+        return apiClient(originalRequest);
+      }
     }
 
     return Promise.reject(error);

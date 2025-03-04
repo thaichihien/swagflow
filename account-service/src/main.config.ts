@@ -25,7 +25,7 @@ export const mainConfig: MainConfig = {
   globalPrefix: 'api/v1',
   corsOptions: {
     allowedHeaders: ['content-type', 'authorization'],
-    origin: ALLOWED_ORIGINS,
+    origin: ALLOWED_ORIGINS.split(','),
     credentials: true,
   },
 };
