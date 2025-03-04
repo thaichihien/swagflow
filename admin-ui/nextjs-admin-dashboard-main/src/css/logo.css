@@ -1,0 +1,30 @@
+:root {
+  --dark-green: #606c5d;
+  --white-pink: #fff4f4;
+  --light-gold: #f7e6c4;
+  --dark-gold: #f1c376;
+}
+
+.logo-font {
+  font-family: "Satisfy", cursive;
+}
+
+.logo-dark {
+  color: var(--white-pink);
+}
+
+.logo-dark:hover {
+  color: var(--white-pink);
+}
+
+.logo-light {
+  color: var(--dark-green);
+}
+
+.logo-light:hover {
+  color: var(--dark-green);
+}
+
+.logo-font span {
+  color: var(--dark-gold);
+}
