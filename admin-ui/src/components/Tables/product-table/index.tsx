@@ -153,7 +153,11 @@ export function ProductTable() {
             >
               <TableCell className="flex min-w-fit items-center gap-3 pl-5 sm:pl-6 xl:pl-7.5">
                 <Image
-                  src={product.images[0] ?? null}
+                  src={
+                    product.images[0] && product.images[0].length > 0
+                      ? product.images[0]
+                      : null
+                  }
                   className="aspect-[6/5] w-15 rounded-[5px] object-cover"
                   width={60}
                   height={50}

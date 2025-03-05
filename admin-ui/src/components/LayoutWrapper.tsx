@@ -3,8 +3,9 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./Layouts/sidebar";
 import { Header } from "./Layouts/header";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { setupInterceptors } from "@/lib/api-client";
 
 export default function LayoutWrapper({
   children,
@@ -13,6 +14,7 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isAuthPage = pathname === "/sign-in";
+  //setupInterceptors();
 
   return !isAuthPage ? (
     <div className="flex min-h-screen">

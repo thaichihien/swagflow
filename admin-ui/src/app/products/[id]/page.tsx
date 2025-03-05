@@ -15,8 +15,8 @@ export default async function Page({ params }: any) {
     price: 0,
     category: "",
     brand: "",
-    categoryId: "",
-    brandId: "",
+    category_id: "",
+    brand_id: "",
     images: [],
     sizes: [],
   };

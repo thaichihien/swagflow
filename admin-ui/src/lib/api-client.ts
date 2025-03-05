@@ -1,4 +1,4 @@
-import { refreshAccessToken } from "@/context/auth-context";
+import { refreshAccessToken, useAuth } from "@/context/auth-context";
 import axios from "axios";
 
 const apiClient = axios.create({
@@ -9,17 +9,21 @@ const apiClient = axios.create({
   },
 });
 
+export const setupInterceptors = () => {
+  apiClient.interceptors.request.use(
+    (config) => {
+      const { accessToken } = useAuth();
 
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
+      console.log("accessToken", accessToken);
+
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
+};
 
 apiClient.interceptors.response.use(
   (response) => response, // Return data if successful

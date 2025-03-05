@@ -18,11 +18,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export function ProductSizeTable({
-  defaultSizes,
+  sizes,
+  setSizes,
 }: {
-  defaultSizes: ProductDetailType["sizes"];
+  sizes: ProductDetailType["sizes"];
+  setSizes: (sizes: ProductDetailType["sizes"]) => void;
 }) {
-  const [sizes, setSizes] = useState<ProductDetailType["sizes"]>(defaultSizes);
   const [availableSizes, setAvailableSizes] = useState<
     { id: number; name: string }[]
   >([]);
@@ -41,7 +42,7 @@ export function ProductSizeTable({
   }
 
   function addSize(newSize: { id: number; name: string }) {
-    setSizes([...sizes, { ...newSize, quantity: 0 }]);
+    setSizes([...sizes, { id: newSize.id, name: newSize.name, quantity: 0 }]);
   }
 
   useEffect(() => {
@@ -128,8 +129,7 @@ export function ProductSizeTable({
                   <div>
                     <InputGroup
                       className="mb-5.5"
-                      type='number'
-                      name="name"
+                      type="number"
                       label=""
                       placeholder=""
                       defaultValue={s.quantity.toString()}

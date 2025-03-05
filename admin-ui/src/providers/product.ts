@@ -8,12 +8,25 @@ export interface ProductDetailType {
   price: number;
   category: string;
   brand: string;
-  categoryId: string;
-  brandId: string;
+  category_id: string;
+  brand_id: string;
   images: string[];
   sizes: {
     id: number;
     name: string;
+    quantity: number;
+  }[];
+}
+
+export interface CreateProductType {
+  name: string;
+  price: number;
+  description: string;
+  category_id: string;
+  brand_id: string;
+  sizes: {
+    id: number;
+
     quantity: number;
   }[];
 }
@@ -56,6 +69,21 @@ export async function getSizes() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch sizes:", error);
+    throw error;
+  }
+}
+
+export async function createProduct(
+  body: CreateProductType,
+): Promise<ProductDetailType> {
+  try {
+    const response = await apiClient.post(
+      `/product-service/products`,
+      body,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create product:", error);
     throw error;
   }
 }

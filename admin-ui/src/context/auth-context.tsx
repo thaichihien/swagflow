@@ -85,7 +85,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     const { data } = await apiClient.get(`${AUTH_SERVICE_PATH}/refresh`);
 
     // console.log("Refreshed token:", data.access_token);
-    //apiClient.defaults.headers.Authorization = `Bearer ${data.access_token}`;
+    apiClient.defaults.headers.Authorization = `Bearer ${data.access_token}`;
     return data.access_token;
   } catch (error) {
     console.error("Failed to refresh token:", error);

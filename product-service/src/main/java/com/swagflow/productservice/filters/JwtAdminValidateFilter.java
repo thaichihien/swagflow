@@ -50,6 +50,8 @@ public class JwtAdminValidateFilter extends OncePerRequestFilter {
         //log.info(token);
         UserResponse userResponse = validateJwtAdmin(token);
 
+        //System.out.println(userResponse);
+
         if (userResponse != null) {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(

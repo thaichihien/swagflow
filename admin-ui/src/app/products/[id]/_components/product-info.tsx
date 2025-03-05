@@ -10,15 +10,18 @@ import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { Select } from "@/components/FormElements/select";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import {
+  createProduct,
   getBrands,
   getCategoies,
   ProductDetailType,
 } from "@/providers/product";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ProductSizeTable } from "./size-table";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export function ProductInfoForm({ product }: { product: ProductDetailType }) {
-  console.log(product);
+  const router = useRouter();
 
   const [categries, setCategories] = useState<
     {
@@ -33,6 +36,8 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
     }[]
   >([]);
 
+  const [sizes, setSizes] = useState<ProductDetailType["sizes"]>(product.sizes);
+
   async function fetchCategories() {
     const data = await getCategoies();
     setCategories(data);
@@ -46,17 +51,48 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
     fetchBrands();
   }, []);
 
-  console.log({ categries });
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = new FormData(event.currentTarget);
+    const data: any = Object.fromEntries(form.entries());
+    console.log(data);
+    console.log(sizes);
+
+    try {
+      const newProduct = await createProduct({
+        name: data.name,
+        price: parseFloat(data.price),
+        description: data.description,
+        category_id: data.category_id,
+        brand_id: data.brand_id,
+        sizes: sizes.map((s) => {
+          return {
+            id: s.id,
+            quantity: s.quantity,
+          };
+        }),
+      });
+
+      console.log(newProduct);
+
+      toast.success("Product created successfully");
+      router.push(`/products/${newProduct.id}`);
+    } catch (error) {
+      toast.error("Failed to create product");
+    }
+  }
 
   return (
     <ShowcaseSection title="Product Information" className="!p-7">
-      <form>
+      <form onSubmit={handleSubmit}>
         <InputGroup
           className="mb-5.5"
           type="text"
           name="name"
           label="Name"
           placeholder="devidjhon24"
+          required
           defaultValue={product.name}
           // icon={<UserIcon />}
           // iconPosition="left"
@@ -78,17 +114,19 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
         <Select
           className="mb-5.5"
           label="Category"
+          name="category_id"
           items={categries.map((category) => {
             return {
               label: category.name,
               value: category.id,
             };
           })}
-          defaultValue={product.categoryId}
+          defaultValue={product.category_id}
         />
 
         <Select
           className="mb-5.5"
+          name="brand_id"
           label="Brand"
           items={brands.map((brand) => {
             return {
@@ -96,10 +134,11 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
               value: brand.id,
             };
           })}
-          defaultValue={product.brandId}
+          defaultValue={product.brand_id}
         />
 
         <TextAreaGroup
+          name="description"
           className="mb-5.5"
           label="Descrpition"
           placeholder="Write product description here"
@@ -107,7 +146,7 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
           defaultValue={product.description}
         />
 
-        <ProductSizeTable defaultSizes={product.sizes}></ProductSizeTable>
+        <ProductSizeTable sizes={sizes} setSizes={setSizes}></ProductSizeTable>
 
         <div className="flex justify-end gap-3">
           <button

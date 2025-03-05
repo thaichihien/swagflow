@@ -3,6 +3,7 @@ import { useId } from "react";
 
 interface PropsType {
   label: string;
+  name?: string;
   placeholder: string;
   required?: boolean;
   disabled?: boolean;
@@ -18,6 +19,7 @@ export function TextAreaGroup({
   required,
   disabled,
   active,
+  name,
   className,
   icon,
   defaultValue,
@@ -35,6 +37,7 @@ export function TextAreaGroup({
 
       <div className="relative mt-3 [&_svg]:pointer-events-none [&_svg]:absolute [&_svg]:left-5.5 [&_svg]:top-5.5">
         <textarea
+          name={name}
           id={id}
           rows={6}
           placeholder={placeholder}
