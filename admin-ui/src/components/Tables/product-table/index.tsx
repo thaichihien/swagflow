@@ -97,29 +97,40 @@ export function ProductTable() {
           Products
         </h2>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          name="profilePhoto"
-          id="profilePhoto"
-          accept="image/png, image/jpg, image/jpeg"
-          hidden
-          multiple={false}
-          onChange={(e) => {
-            importProduct(e);
-          }}
-        />
+        <div className="flex">
+          {" "}
+          <input
+            ref={fileInputRef}
+            type="file"
+            name="profilePhoto"
+            id="profilePhoto"
+            accept="image/png, image/jpg, image/jpeg"
+            hidden
+            multiple={false}
+            onChange={(e) => {
+              importProduct(e);
+            }}
+          />
+          <Button
+            label={"Import .CSV"}
+            variant="primary"
+            className="mr-5"
+            shape="rounded"
+            onClick={() => {
+              console.log("click");
 
-        <Button
-          label={"Import .CSV"}
-          variant="primary"
-          shape="rounded"
-          onClick={() => {
-            console.log("click");
-
-            fileInputRef.current?.click();
-          }}
-        ></Button>
+              fileInputRef.current?.click();
+            }}
+          ></Button>
+          <Button
+            label={"Create new product"}
+            variant="primary"
+            shape="rounded"
+            onClick={() => {
+              router.push("/products/new");
+            }}
+          ></Button>
+        </div>
       </div>
 
       <Table>

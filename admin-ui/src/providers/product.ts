@@ -8,10 +8,11 @@ export interface ProductDetailType {
   price: number;
   category: string;
   brand: string;
-  categoryId: string
-  brandId: string
-  image: string;
+  categoryId: string;
+  brandId: string;
+  images: string[];
   sizes: {
+    id: number;
     name: string;
     quantity: number;
   }[];
@@ -40,11 +41,21 @@ export async function getCategoies() {
 }
 
 export async function getBrands() {
-    try {
-      const response = await apiClient.get(`/product-service/brands`);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch brands:", error);
-      throw error;
-    }
+  try {
+    const response = await apiClient.get(`/product-service/brands`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch brands:", error);
+    throw error;
   }
+}
+
+export async function getSizes() {
+  try {
+    const response = await apiClient.get(`/product-service/size`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch sizes:", error);
+    throw error;
+  }
+}

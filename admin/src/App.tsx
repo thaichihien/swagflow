@@ -16,10 +16,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/add-product" element={<AddProduct />} />
           <Route path="/" element={<ProtectedLayout></ProtectedLayout>}>
             <Route index element={<Dashboard />} />
             <Route path="/products" element={<ProductList />} />
-            <Route path="/add-product" element={<AddProduct />} />
+           
             <Route path="/import" element={<ImportProducts />} />
             <Route path="/playground" element={<Playground />} />
           </Route>

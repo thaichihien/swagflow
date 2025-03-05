@@ -15,6 +15,7 @@ import {
   ProductDetailType,
 } from "@/providers/product";
 import { useEffect, useState } from "react";
+import { ProductSizeTable } from "./size-table";
 
 export function ProductInfoForm({ product }: { product: ProductDetailType }) {
   console.log(product);
@@ -101,10 +102,12 @@ export function ProductInfoForm({ product }: { product: ProductDetailType }) {
         <TextAreaGroup
           className="mb-5.5"
           label="Descrpition"
-          placeholder="Write your bio here"
+          placeholder="Write product description here"
           icon={<PencilSquareIcon />}
           defaultValue={product.description}
         />
+
+        <ProductSizeTable defaultSizes={product.sizes}></ProductSizeTable>
 
         <div className="flex justify-end gap-3">
           <button
