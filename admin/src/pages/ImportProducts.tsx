@@ -28,6 +28,7 @@ function ImportProducts({}: Props) {
       const res = await fetch(serverConfig.endpoint("/product/import"), {
         method: "POST",
         body: formData,
+        headers: { "Content-Type": "multipart/form-data" },
       })
 
       if (res.ok) {

@@ -11,11 +11,14 @@ import {
 import Image from "next/image";
 import { getTopProducts } from "../fetch";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { ProductsSkeleton } from "./skeleton";
 import { getProducts } from "./get-products";
 import { PreviewIcon } from "../icons";
 import { TrashIcon } from "@/assets/icons";
+import { Button } from "@/components/ui-elements/button";
+import { toast } from "react-toastify";
+import { importProductCSVfile } from "./import-products";
 
 export type ProductType = {
   id: string;
@@ -29,6 +32,7 @@ export type ProductType = {
 
 export function ProductTable() {
   const [products, setProducts] = useState<ProductType[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const searchParams = useSearchParams();
@@ -76,14 +80,45 @@ export function ProductTable() {
     return range;
   };
 
+  async function importProduct(e: any) {
+    const selectedFile = e.target.files?.item(0);
+    if (selectedFile) {
+      await importProductCSVfile(selectedFile);
+    }
+  }
+
   return loading ? (
     <ProductsSkeleton></ProductsSkeleton>
   ) : (
     <div className="rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
-      <div className="px-6 py-4 sm:px-7 sm:py-5 xl:px-8.5">
+      <div className="flex items-center justify-between px-6 py-4 sm:px-7 sm:py-5 xl:px-8.5">
         <h2 className="text-2xl font-bold text-dark dark:text-white">
           Products
         </h2>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          name="profilePhoto"
+          id="profilePhoto"
+          accept="image/png, image/jpg, image/jpeg"
+          hidden
+          multiple={false}
+          onChange={(e) => {
+            importProduct(e);
+          }}
+        />
+
+        <Button
+          label={"Import .CSV"}
+          variant="primary"
+          shape="rounded"
+          onClick={() => {
+            console.log("click");
+
+            fileInputRef.current?.click();
+          }}
+        ></Button>
       </div>
 
       <Table>
@@ -158,7 +193,7 @@ export function ProductTable() {
             <button
               onClick={() => router.push(`?page=${page - 1}&limit=${limit}`)}
               disabled={page <= 1}
-              className="rounded border px-3 py-1 disabled:opacity-50 mr-2"
+              className="mr-2 rounded border px-3 py-1 disabled:opacity-50"
             >
               Previous
             </button>
@@ -182,7 +217,7 @@ export function ProductTable() {
             <button
               onClick={() => router.push(`?page=${page + 1}&limit=${limit}`)}
               disabled={page >= totalPages}
-              className="rounded border px-3 py-1 disabled:opacity-50 ml-2"
+              className="ml-2 rounded border px-3 py-1 disabled:opacity-50"
             >
               Next
             </button>
