@@ -6,7 +6,7 @@ import { ProductServiceResponse } from './interfaces/product-response.interface'
 @Injectable()
 export class ProductHTTPClientService implements ProductService {
   async findAllByIds(ids: string[]): Promise<ProductDetailDto[]> {
-    const queryParam = ids.map((id) => `ids=${id}`).join('&');
+    const queryParam = ids.map((id) => `id=${id}`).join('&');
 
     try {
       const rawResponse = await fetch(

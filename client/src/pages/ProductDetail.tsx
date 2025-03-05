@@ -29,7 +29,7 @@ function ProductDetail({}: Props) {
     }
     try {
       const res = await axios.get(
-        `${PRODUCT_SERVICE_PATH}/products/detail/${id}?`,
+        `${PRODUCT_SERVICE_PATH}/products/${id}?`,
       )
 
       if (res.status === 200) {

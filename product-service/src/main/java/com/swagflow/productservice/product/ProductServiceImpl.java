@@ -189,6 +189,8 @@ public class ProductServiceImpl implements ProductService {
                 .price(one.getPrice())
                 .category(one.getCategory().getName())
                 .brand(one.getBrand().getName())
+                .brandId(one.getBrand().getId())
+                .categoryId(one.getCategory().getId())
                 .sizes(sizeResponses)
                 .images(imgUrls)
                 .build();

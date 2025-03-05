@@ -24,7 +24,11 @@ export function Select({
 }: PropsType) {
   const id = useId();
 
-  const [isOptionSelected, setIsOptionSelected] = useState(false);
+  const [isOptionSelected, setIsOptionSelected] = useState(
+    defaultValue ? true : false,
+  );
+
+  const [selectedValue, setSelectedValue] = useState(defaultValue);
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -44,8 +48,12 @@ export function Select({
 
         <select
           id={id}
-          defaultValue={defaultValue || ""}
-          onChange={() => setIsOptionSelected(true)}
+          value={selectedValue}
+          onChange={(e) => {
+            setIsOptionSelected(true);
+
+            setSelectedValue(e.target.value);
+          }}
           className={cn(
             "w-full appearance-none rounded-lg border border-stroke bg-transparent px-5.5 py-3 outline-none transition focus:border-primary active:border-primary dark:border-dark-3 dark:bg-dark-2 dark:focus:border-primary [&>option]:text-dark-5 dark:[&>option]:text-dark-6",
             isOptionSelected && "text-dark dark:text-white",

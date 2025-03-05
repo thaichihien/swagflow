@@ -11,5 +11,7 @@ import java.util.UUID;
 @SuperBuilder
 public class ProductResponse extends SimpleProductResponse {
     protected String description;
+    protected UUID categoryId;
+    protected UUID brandId;
     protected List<ProductSizeResponse> sizes;
 }

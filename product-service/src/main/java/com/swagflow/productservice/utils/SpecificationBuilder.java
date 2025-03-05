@@ -22,7 +22,7 @@ public class SpecificationBuilder<T> {
         if (specificationList.isEmpty()) {
             return Specification.where(null);
         }
-        Specification<T> result = Specification.where(specificationList.getFirst());
+        Specification<T> result = Specification.where(specificationList.get(0));
         for (Specification<T> specification : specificationList) {
             result.and(specification);
         }

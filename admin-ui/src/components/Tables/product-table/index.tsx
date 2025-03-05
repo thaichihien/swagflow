@@ -19,6 +19,7 @@ import { TrashIcon } from "@/assets/icons";
 import { Button } from "@/components/ui-elements/button";
 import { toast } from "react-toastify";
 import { importProductCSVfile } from "./import-products";
+import Link from "next/link";
 
 export type ProductType = {
   id: string;
@@ -157,10 +158,13 @@ export function ProductTable() {
 
               <TableCell className="xl:pr-7.5">
                 <div className="flex items-center justify-end gap-x-3.5">
-                  <button className="hover:text-primary">
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="hover:text-primary"
+                  >
                     <span className="sr-only">View Invoice</span>
                     <PreviewIcon />
-                  </button>
+                  </Link>
 
                   <button className="hover:text-primary">
                     <span className="sr-only">Delete Invoice</span>
