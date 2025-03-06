@@ -6,6 +6,9 @@ export class CustomerRepository implements IRepository<Customer> {
   constructor(private prismaService: PrismaService) {}
 
   async create(dto: any): Promise<Customer> {
+
+   
+
     const created = await this.prismaService.customer.create({
       data: dto,
     });

@@ -4,6 +4,7 @@ import com.swagflow.productservice.exception.response.BadRequestResponse;
 import com.swagflow.productservice.exception.response.ForbiddenResponse;
 import com.swagflow.productservice.exception.response.HttpExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,6 +25,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     public HttpExceptionResponse handleNotFoundElement(NoSuchElementException e){
+        return new BadRequestResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public HttpExceptionResponse handleInvalidType(InvalidDataAccessApiUsageException e){
         return new BadRequestResponse(e.getMessage());
     }
 

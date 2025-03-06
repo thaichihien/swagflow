@@ -15,7 +15,7 @@ services:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/swagflow-product
+    url: jdbc:postgresql://localhost:5433/swagflow-product
     username: swagflow-product
     password: 258456
     driver-class-name: org.postgresql.Driver
@@ -31,13 +31,13 @@ spring:
     output:
       ansi:
         enabled: ALWAYS
-    rabbitmq:
-      host: localhost
-      port: 5672
-      username: guest
-      password: guest
-      publisher-confirm-type: correlated
-      publisher-returns: true
+#    rabbitmq:
+#      host: localhost
+#      port: 5672
+#      username: guest
+#      password: guest
+#      publisher-confirm-type: correlated
+#      publisher-returns: true
 
 
 springdoc:

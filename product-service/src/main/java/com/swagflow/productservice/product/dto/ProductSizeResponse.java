@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductSizeResponse {
 
-    @JsonIgnore
+
     private String id;
     private String name;
     private Integer quantity;

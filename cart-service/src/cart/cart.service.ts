@@ -18,6 +18,8 @@ import { CustomerProfileFullDto } from './dto/customer-profile-full.dto';
 import { MessagingService } from 'src/messaging/messaging.service';
 import { ProductDetailDto } from './dto/product-detail.dto';
 import { CartEntity } from './enities/cart.enity';
+import { ProductService } from 'src/product/product-abstract.service';
+import { CustomerService } from 'src/customer/interfaces/customer.service';
 
 @Injectable()
 export class CartService {
@@ -26,7 +28,9 @@ export class CartService {
     private readonly dataServices: IDataServices,
     @Inject(REDIS_SERVICE)
     private readonly redisService: RedisClientType,
-    private readonly messagingService: MessagingService,
+    private readonly productService: ProductService,
+    private readonly customerService: CustomerService,
+    //private readonly messagingService: MessagingService,
   ) {}
 
   //-----------Redis Session------------------
@@ -34,7 +38,7 @@ export class CartService {
   async findCartSession(cartId: string) {
     const cartResponse: CartResDto = {
       totalPrice: 0,
-      totalQuantity : 0,
+      totalQuantity: 0,
       items: [],
     };
     const cart = await this.redisService.hGetAll(this.getCartKey(cartId));
@@ -44,27 +48,33 @@ export class CartService {
     }
 
     // -- get product detail list from product service
-    const response = await this.messagingService.send<
-      ProductDetailDto[],
-      string[]
-    >(
+    // const response = await this.messagingService.send<
+    //   ProductDetailDto[],
+    //   string[]
+    // >(
+    //   Object.keys(cart).map((item) => {
+    //     return item.split('#')[0];
+    //   }),
+    //   this.messagingService.PRODUCTS_DETAIL_QUEUE,
+    // );
+
+    // if (!response.success) {
+    //   this.logger.error(response.message);
+    //   throw new InternalServerErrorException('communication error');
+    // }
+
+    const response = await this.productService.findAllByIds(
       Object.keys(cart).map((item) => {
         return item.split('#')[0];
       }),
-      this.messagingService.PRODUCTS_DETAIL_QUEUE,
     );
 
-    if (!response.success) {
-      this.logger.error(response.message);
-      throw new InternalServerErrorException('communication error');
-    }
-
     const productMap = new Map<string, ProductDetailDto>(
-      response.data.map((item) => [item.id, item]),
+      response.map((item) => [item.id, item]),
     );
 
     let totalPrice = 0;
-    let totalQuantity = 0
+    let totalQuantity = 0;
     // for (const product of response.data) {
     //   const item: CartItemResDto = {
     //     product: product,
@@ -82,13 +92,13 @@ export class CartService {
         selectedSize: p[1],
       };
 
-      totalQuantity += item.quantity
+      totalQuantity += item.quantity;
       totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
     // TODO calculate price
     cartResponse.totalPrice = +totalPrice.toFixed(2);
-    cartResponse.totalQuantity = totalQuantity
+    cartResponse.totalQuantity = totalQuantity;
 
     return cartResponse;
   }
@@ -282,16 +292,13 @@ export class CartService {
   }
 
   async getCustomerInfo(token: string): Promise<CustomerProfileFullDto> {
-    const response = await this.messagingService.send<
-      CustomerProfileFullDto,
-      string
-    >(token, this.messagingService.ACCOUNT_QUEUE);
-    if (!response.success) {
-      this.logger.error(response.message);
-      return null;
+    const response = await this.customerService.getCustomerFromToken(token);
+
+    if (!response) {
+      throw new ForbiddenException('invalid token');
     }
 
-    return response.data;
+    return response;
   }
 
   async findCartForCustomer(
@@ -364,30 +371,21 @@ export class CartService {
     const cartResponse: CartResDto = {
       totalPrice: 0,
       items: [],
-      totalQuantity : 0
+      totalQuantity: 0,
     };
 
-    const response = await this.messagingService.send<
-      ProductDetailDto[],
-      string[]
-    >(
-      cart.items.map((cartItem) => cartItem.productSizeId.split('#')[0]),
-      this.messagingService.PRODUCTS_DETAIL_QUEUE,
+    const response = await this.productService.findAllByIds(
+      Object.keys(cart).map((item) => {
+        return item.split('#')[0];
+      }),
     );
 
-    if (!response.success) {
-      this.logger.error(response.message);
-      throw new InternalServerErrorException('communication error');
-    }
-
     const productMap = new Map<string, ProductDetailDto>(
-      response.data.map((item) => [item.id, item]),
+      response.map((item) => [item.id, item]),
     );
 
     let totalPrice = 0;
     let totalQuantity = 0;
-   
-   
 
     for (const cartItem of cart.items) {
       //console.log(productMap.get(cartItem.productSizeId.split('#')[0]))
@@ -397,12 +395,12 @@ export class CartService {
         selectedSize: cartItem.productSizeId.split('#')[1],
       };
 
-      totalQuantity += item.quantity
+      totalQuantity += item.quantity;
       totalPrice += item.product.price * item.quantity;
       cartResponse.items.push(item);
     }
     cartResponse.totalPrice = +totalPrice.toFixed(2);
-    cartResponse.totalQuantity = totalQuantity
+    cartResponse.totalQuantity = totalQuantity;
 
     return cartResponse;
   }

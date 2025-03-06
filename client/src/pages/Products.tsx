@@ -28,7 +28,7 @@ function Products() {
   }
 
   function getApiUrlFilter(next: string | null): string {
-    const apiPath = `${PRODUCT_SERVICE_PATH}/products/${category}?`
+    const apiPath = `${PRODUCT_SERVICE_PATH}/products?category=${category}&`
     let queryFilterParams: string[] = []
 
     queryFilterParams.push("limit=9")

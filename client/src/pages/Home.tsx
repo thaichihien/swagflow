@@ -16,7 +16,7 @@ function Home() {
 
   async function fetchNewProducts() {
     try {
-      const res = await axios.get(`${PRODUCT_SERVICE_PATH}/products/all?limit=6`)
+      const res = await axios.get(`${PRODUCT_SERVICE_PATH}/products?category=all&limit=6`)
 
       if(res.status == 200){
         const resJson = JSON.parse(res.data)

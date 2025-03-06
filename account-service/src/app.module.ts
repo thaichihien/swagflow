@@ -10,6 +10,7 @@ import { MessagingModule } from './messaging/messaging.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { AccessControlService } from './common/security/access-control.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { AccessControlService } from './common/security/access-control.service';
     AuthModule,
     PrismaModule,
     DatabaseModule,
-    MessagingModule,
+    //MessagingModule,
     UserModule,
     RoleModule,
   ],

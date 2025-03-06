@@ -3,6 +3,7 @@ package com.swagflow.productservice.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swagflow.productservice.account.AccountService;
 import com.swagflow.productservice.config.RabbitMQConfig;
 import com.swagflow.productservice.messaging.dto.RabbitMQResponse;
 import com.swagflow.productservice.messaging.dto.SimpleRabbiMQRequest;
@@ -33,8 +34,12 @@ import java.util.List;
 public class JwtAdminValidateFilter extends OncePerRequestFilter {
 
 
-    private final RabbitTemplate rabbitTemplate;
+    //private final RabbitTemplate rabbitTemplate;
+
+    private final AccountService accountService;
+
     ObjectMapper mapper = new ObjectMapper();
+
     @Override
     protected void doFilterInternal
             (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -45,11 +50,13 @@ public class JwtAdminValidateFilter extends OncePerRequestFilter {
         //log.info(token);
         UserResponse userResponse = validateJwtAdmin(token);
 
-        if(userResponse != null){
+        //System.out.println(userResponse);
+
+        if (userResponse != null) {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             userResponse.getFirstName(), null, userResponse.getRoles().stream().map(role -> {
-                                return new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
+                        return new SimpleGrantedAuthority("ROLE_" + role.toUpperCase());
                     }).toList());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -61,26 +68,29 @@ public class JwtAdminValidateFilter extends OncePerRequestFilter {
     }
 
     private UserResponse validateJwtAdmin(String token) throws JsonProcessingException {
-        if(token == null){
+        if (token == null) {
             return null;
         }
-        SimpleRabbiMQRequest<String> tokenRequest = SimpleRabbiMQRequest.<String>builder().message(token).build();
-        Message tokenMessage = MessageBuilder.withBody(mapper.writeValueAsBytes(tokenRequest)).build();
-        Message result = rabbitTemplate.sendAndReceive(RabbitMQConfig.EXCHANGE_NAME,RabbitMQConfig.ACCOUNT_QUEUE,tokenMessage);
+//        SimpleRabbiMQRequest<String> tokenRequest = SimpleRabbiMQRequest.<String>builder().message(token).build();
+//        Message tokenMessage = MessageBuilder.withBody(mapper.writeValueAsBytes(tokenRequest)).build();
+//        Message result = rabbitTemplate.sendAndReceive(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ACCOUNT_QUEUE, tokenMessage);
 
-        if(result != null){
-            String jsonString= new String(result.getBody());
-            RabbitMQResponse<UserResponse> response = mapper.readValue(jsonString, new TypeReference<>() {
-            });
 
-            log.info(response.getMessage());
-            if(!response.isSuccess()){
-                return null;
-            }
+        return accountService.findUserByToken(token);
 
-            return response.getData();
-        }
-        return null;
+//        if (result != null) {
+////            String jsonString = new String(result.getBody());
+////            RabbitMQResponse<UserResponse> response = mapper.readValue(jsonString, new TypeReference<>() {
+////            });
+//
+//            log.info(response.getMessage());
+//            if (!response.isSuccess()) {
+//                return null;
+//            }
+//
+//            return response.getData();
+        //}
+        //return null;
     }
 
 

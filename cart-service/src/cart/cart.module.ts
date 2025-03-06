@@ -4,9 +4,11 @@ import { CartController } from './cart.controller';
 import { DatabaseModule } from 'src/database/database.module';
 import { RedisModule } from 'src/redis/redis.module';
 import { MessagingModule } from 'src/messaging/messaging.module';
+import { ProductModule } from 'src/product/product.module';
+import { CustomerModule } from 'src/customer/customer.module';
 
 @Module({
-  imports: [DatabaseModule, RedisModule, MessagingModule],
+  imports: [DatabaseModule, RedisModule, ProductModule, CustomerModule],
   controllers: [CartController],
   providers: [CartService],
 })

@@ -4,6 +4,7 @@ import com.swagflow.productservice.product.dto.*;
 import com.swagflow.productservice.utils.CSVService;
 import com.swagflow.productservice.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Import list of products from csv file")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
+    //@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STAFF')")
     @PostMapping("/import")
     public ResponseEntity<String> importProductsFromFile(
             @RequestParam("file") MultipartFile file
@@ -77,23 +78,39 @@ public class ProductController {
     }
 
     @Operation(summary = "Get all products")
-    @GetMapping("/{category}")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponseCursorPagination getAllProductsForCustomerInfinity(
-            @PathVariable String category,
+            @RequestParam(required = false)String category,
             @RequestParam(required = false)String next,
             @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit,
-            @RequestParam(name = "brand",required = false)List<String> brands
+            @RequestParam(name = "brand",required = false)List<String> brands,
+            @RequestParam(name = "id",required = false)List<String> ids
     ){
 
-//        if(category.equals("all")){
-//            return  productService.getProducts(next,limit);
-//        }
-        return productService.getProducts(next,limit,category,brands);
+        return productService.getProducts(next,limit,category,brands,ids);
     }
 
+//    @Operation(summary = "Get all products in category")
+//    @GetMapping("/{category}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public ProductResponseCursorPagination getAllProductsForCustomerInfinity(
+//            @Parameter(required = false)
+//            @PathVariable(required = false) String category,
+//            @RequestParam(required = false)String next,
+//            @RequestParam(defaultValue = Constants.PAGINATION.LIMIT_PER_PAGE_STRING)int limit,
+//            @RequestParam(name = "brand",required = false)List<String> brands,
+//            @RequestParam(name = "ids",required = false)List<String> ids
+//    ){
+//
+////        if(category.equals("all")){
+////            return  productService.getProducts(next,limit);
+////        }
+//        return productService.getProducts(next,limit,category,brands,ids);
+//    }
+
     @Operation(summary = "get product by id")
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getProductWithId(@PathVariable String id){
         return productService.findById(id);

@@ -14,14 +14,14 @@ export class CookieTokenStrategy extends PassportStrategy(Strategy, 'cookie') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        CookieTokenStrategy.extractJwtFromCookie,
+        CookieTokenStrategy.extractJwtFromCookie
       ]),
       secretOrKey: process.env['REFRESH_SECRET'],
       passReqToCallback: true,
     });
   }
 
-  static extractJwtFromCookie(req: Request): string | null {
+  static extractJwtFromCookie(req: any): string | null {
     
     if (req.cookies && req.cookies['token']) {
      
