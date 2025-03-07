@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package account;
+
+
+option java_package = "com.swagflow.productservice";
+option java_multiple_files = true;
+
+
+service AccountService{
+  rpc getAccountByToken(getAccountRequest) returns (getAccountResponse) {}
+}
+
+message getAccountRequest{
+  string token = 1;
+}
+
+message getAccountResponse{
+  string id = 1;
+  string email = 2;
+  string firstName = 3;
+  string lastName = 4;
+  repeated string roles = 5;
+}

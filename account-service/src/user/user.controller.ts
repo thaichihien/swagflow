@@ -20,8 +20,10 @@ import { HasRoles } from 'src/common/decorators/has-roles.decorator';
 import { Role } from 'src/common/constants/role.enum';
 import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
+import { GrpcMethod } from '@nestjs/microservices';
+import { getAccountRequesDto } from './dto/get-account-request.dto';
 
-@ApiTags("User")
+@ApiTags('User')
 @Controller('users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -40,7 +42,7 @@ export class UserController {
   findAll() {
     return this.userService.findAll();
   }
-  
+
   @HasRoles(Role.Staff, Role.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Get('/profile')
@@ -56,8 +58,6 @@ export class UserController {
     return this.userService.findById(id);
   }
 
- 
-
   @HasRoles(Role.Admin)
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Patch(':id')
@@ -66,7 +66,7 @@ export class UserController {
   }
 
   // @HasRoles(Role.Admin)
-   @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Put('/role/:roleId')
   addRole(@Req() req: Request, @Param('roleId') roleId: string) {
     const id = req.user['sub'];
@@ -79,4 +79,6 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }
+
+  
 }

@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @Slf4j
 public class AccountHTTPClientService implements AccountService {
