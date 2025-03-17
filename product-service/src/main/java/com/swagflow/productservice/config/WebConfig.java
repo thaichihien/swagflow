@@ -20,14 +20,16 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Value("${services.cors.allow-origins}")
-    private String allowOrigins;
+    private String allowOriginString;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
 
+        String[] allowedOrigins = allowOriginString.split(",");
+
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                //.allowedOrigins(allowOrigins)
+                //.allowedOriginPatterns("*")
+                .allowedOrigins(allowedOrigins)
                 .allowedHeaders("content-type", "authorization")
                 .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
 //                .allowedOrigins("http://domain2.com")

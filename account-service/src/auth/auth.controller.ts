@@ -21,6 +21,8 @@ import { CookieInterceptor } from 'src/common/interceptors/cookie.interceptor';
 import { CookieTokenGuard } from 'src/common/guards/cookie-token.guard';
 import { UserParam } from './dto/user-param.dto';
 import { ClearCookieInterceptor } from 'src/common/interceptors/clear-cookie.interceptor';
+import { GrpcMethod } from '@nestjs/microservices';
+import { getAccountRequesDto } from 'src/user/dto/get-account-request.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -119,5 +121,10 @@ export class AuthController {
   @Get('decode/:token')
   async decodeToken(@Param('token') token: string) {
     return await this.authService.decodeToken(token);
+  }
+
+  @GrpcMethod('AccountService', 'getAccountByToken')
+  async getAccountByToken(data: getAccountRequesDto) {
+    return await this.authService.verifyUser(data.token);
   }
 }

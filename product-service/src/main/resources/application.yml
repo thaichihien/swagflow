@@ -11,7 +11,7 @@ services:
   rabbitmq:
     exchange-name: swagflow
   cors:
-    allow-origins: http://localhost:5173
+    allow-origins: http://localhost:5173,http://localhost:3000
 
 spring:
   datasource:
